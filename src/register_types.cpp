@@ -6,8 +6,10 @@
 #include <godot_cpp/classes/editor_plugin_registration.hpp>
 
 #include "tag_plugin.hpp"
-#include "tag_editor.hpp"
-#include "tag.h"
+#include "editor/tag_editor.hpp"
+
+#include "tag/tag.h"
+#include "tag/tag_container.h"
 
 using namespace godot;
 
@@ -17,6 +19,7 @@ void initialize(ModuleInitializationLevel p_level)
 	{		
 		case MODULE_INITIALIZATION_LEVEL_SCENE:
 			GDREGISTER_CLASS(Tag);
+			GDREGISTER_CLASS(TagContainer);
 			GDREGISTER_CLASS(TagEditor);
 
 			break;

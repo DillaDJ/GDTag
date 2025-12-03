@@ -5,7 +5,7 @@
 #include <godot_cpp/classes/Node.hpp>
 #include <godot_cpp/classes/Control.hpp>
 
-#include "tag_editor.hpp"
+#include "editor/tag_editor.hpp"
 
 using namespace godot;
 
