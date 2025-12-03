@@ -1,19 +1,35 @@
 #include "register_types.h"
 
 #include <gdextension_interface.h>
-#include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
+#include <godot_cpp/classes/editor_plugin_registration.hpp>
 
+#include "tag_plugin.hpp"
+#include "tag_editor.hpp"
+#include "tag.h"
 
 using namespace godot;
 
-void initialize_gdextension_types(ModuleInitializationLevel p_level)
+void initialize(ModuleInitializationLevel p_level)
 {
-	
+	switch (p_level)
+	{		
+		case MODULE_INITIALIZATION_LEVEL_SCENE:
+			GDREGISTER_CLASS(Tag);
+			GDREGISTER_CLASS(TagEditor);
+
+			break;
+		
+		case MODULE_INITIALIZATION_LEVEL_EDITOR:
+			GDREGISTER_INTERNAL_CLASS(TagPlugin);
+			EditorPlugins::add_by_type<TagPlugin>();
+
+			break;
+	}
 }
 
-void uninitialize_gdextension_types(ModuleInitializationLevel p_level) {
+void uninitialize(ModuleInitializationLevel p_level) {
 	
 }
 
@@ -24,8 +40,8 @@ extern "C"
 	{
 		GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
 		
-		init_obj.register_initializer(initialize_gdextension_types);
-		init_obj.register_terminator(uninitialize_gdextension_types);
+		init_obj.register_initializer(initialize);
+		init_obj.register_terminator(uninitialize);
 		init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
 
 		return init_obj.init();
