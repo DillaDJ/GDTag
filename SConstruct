@@ -39,8 +39,8 @@ env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")
-sources = Glob("src/editor/*.cpp")
-sources = Glob("src/tag/*.cpp")
+sources += Glob("src/editor/*.cpp")
+sources += Glob("src/tag/*.cpp")
 
 if env["target"] in ["editor", "template_debug"]:
     try:
