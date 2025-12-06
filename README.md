@@ -5,7 +5,7 @@ The purpose of the system is to provide a nice way to easily handle string const
 ## Usage
 ### The Tag Editor
 Open the tag editor to start: Project>Tools>Open 
-![Path to the editor](https://github.com/DillaDJ/GDTag/doc/Editor-1.png)
+![Path to the editor](https://github.com/DillaDJ/GDTag/blob/main/doc/Editor-1.png)
 
 Tag Editor, the tag editor should now be docked on the top-left.
 The toolbar has three buttons, clicking the first button will add a tag. Left clicking tags will select them.
