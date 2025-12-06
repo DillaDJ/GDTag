@@ -4,3 +4,7 @@
 
 [node name="Root" type="Node"]
 script = ExtResource("1_eb2wh")
+
+[node name="Tree" type="Tree" parent="."]
+offset_right = 16.0
+offset_bottom = 17.0
