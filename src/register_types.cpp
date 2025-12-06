@@ -6,6 +6,10 @@
 #include <godot_cpp/classes/editor_plugin_registration.hpp>
 
 #include "tag_plugin.hpp"
+
+#include "internal/tag_database.hpp"
+#include "internal/tag_tree_item.h"
+
 #include "editor/tag_editor.hpp"
 
 #include "tag/tag.h"
@@ -18,6 +22,9 @@ void initialize(ModuleInitializationLevel p_level)
 	switch (p_level)
 	{		
 		case MODULE_INITIALIZATION_LEVEL_SCENE:
+			GDREGISTER_INTERNAL_CLASS(TagDatabase);
+			GDREGISTER_INTERNAL_CLASS(TagTreeItem);
+			
 			GDREGISTER_CLASS(Tag);
 			GDREGISTER_CLASS(TagContainer);
 			GDREGISTER_CLASS(TagEditor);
@@ -39,7 +46,8 @@ void uninitialize(ModuleInitializationLevel p_level) {
 extern "C"
 {
 	// Initialization
-	GDExtensionBool GDE_EXPORT GDTag_library_init(GDExtensionInterfaceGetProcAddress p_get_proc_address, GDExtensionClassLibraryPtr p_library, GDExtensionInitialization *r_initialization)
+	GDExtensionBool GDE_EXPORT GDTag_library_init(GDExtensionInterfaceGetProcAddress p_get_proc_address, 
+		GDExtensionClassLibraryPtr p_library, GDExtensionInitialization *r_initialization)
 	{
 		GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
 		

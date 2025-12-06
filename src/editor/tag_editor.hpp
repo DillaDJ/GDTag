@@ -1,5 +1,6 @@
 #pragma once
 
+#include <godot_cpp/variant/string_name.hpp>
 #include <godot_cpp/classes/control.hpp>
 #include <godot_cpp/classes/h_box_container.hpp>
 #include <godot_cpp/classes/v_box_container.hpp>
@@ -21,8 +22,9 @@ public:
 	void initialize();
     
 protected:
-    static void _bind_methods() { }
+    static void _bind_methods();
 	
+private:
 	void add_tag();
 
 	void prompt_soft_delete_tag();
@@ -33,10 +35,16 @@ protected:
 
 	void reparent_children(TreeItem *selected_item);
 
+    void prompt_selected_tag_rename();
+    void update_tag_database();
+
 	void empty_clicked(Vector2 position, MouseButton button);
 
-private:
+    TypedArray<StringName> get_selected_tag_path();
+
     static TagEditor *singleton;
+
+    class TagDatabase *database;
 
     VBoxContainer *main_vbox;
     HBoxContainer *header_hbox;
@@ -51,5 +59,6 @@ private:
 
     ConfirmationDialog *delete_confirm;
 
+    StringName old_tag_name;
     bool hard_delete;
 };

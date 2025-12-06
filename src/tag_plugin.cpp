@@ -5,11 +5,15 @@
 #include <godot_cpp/classes/Node.hpp>
 #include <godot_cpp/classes/Control.hpp>
 
+#include "internal/tag_database.hpp"
 #include "editor/tag_editor.hpp"
 
 using namespace godot;
 
 void TagPlugin::_enter_tree() {
+    TagDatabase *database = TagDatabase::get_singleton();
+    database->initialize();
+
     add_tool_menu_item("Open Tag Editor Dock", callable_mp(this, &TagPlugin::OpenTagEditor));
 }
 
