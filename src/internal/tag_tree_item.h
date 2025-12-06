@@ -1,5 +1,6 @@
 #pragma once
 
+#include <godot_cpp/core/object.hpp>
 #include <godot_cpp/classes/object.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 

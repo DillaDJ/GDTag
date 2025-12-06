@@ -4,6 +4,14 @@
 
 TagDatabase* TagDatabase::singleton = nullptr;
 
+TagDatabase *TagDatabase::get_singleton() {
+	if (singleton == nullptr) {
+		singleton = memnew(TagDatabase);
+	}
+
+	return singleton;
+}
+
 void TagDatabase::initialize() {
 	nodes = Dictionary();
 }
@@ -14,7 +22,7 @@ TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path) {
 	}
 	
 	Variant v = nodes[path[0]];
-	TagTreeItem *current_tag = cast_to<TagTreeItem>(v);
+	TagTreeItem *current_tag = Object::cast_to<TagTreeItem>(v);
 
 	for (size_t i = 0; i < path.size(); i++)
 	{

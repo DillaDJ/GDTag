@@ -1,5 +1,6 @@
 #pragma once
 
+#include <godot_cpp/core/object.hpp>
 #include <godot_cpp/classes/object.hpp>
 #include <godot_cpp/variant/string_name.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
@@ -11,7 +12,7 @@ class TagDatabase : public Object {
     GDCLASS(TagDatabase, Object);
     
 public:
-    static TagDatabase *get_singleton() { return singleton; }
+    static TagDatabase *get_singleton();
 
     void initialize();
 
