@@ -1,7 +1,7 @@
 #pragma once
 
 #include <godot_cpp/classes/object.hpp>
-#include <godot_cpp/variant/typed_dictionary.hpp>
+#include <godot_cpp/variant/dictionary.hpp>
 
 using namespace godot;
 
@@ -24,7 +24,7 @@ protected:
 private:
     TagTreeItem *parent;
 
-    TypedDictionary<StringName, TagTreeItem*> children;
+    Dictionary children;
 
     StringName name;
 };

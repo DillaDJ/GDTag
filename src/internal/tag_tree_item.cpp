@@ -1,7 +1,7 @@
 #include "tag_tree_item.h"
 
 TagTreeItem::TagTreeItem() {
-    children = TypedDictionary<StringName, TagTreeItem>();
+    children = Dictionary();
 }
 
 TagTreeItem::~TagTreeItem() {

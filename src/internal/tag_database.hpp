@@ -2,7 +2,8 @@
 
 #include <godot_cpp/classes/object.hpp>
 #include <godot_cpp/variant/string_name.hpp>
-#include <godot_cpp/variant/typed_dictionary.hpp>
+#include <godot_cpp/variant/dictionary.hpp>
+#include "tag_tree_item.h"
 
 using namespace godot;
 
@@ -17,6 +18,7 @@ public:
     TagTreeItem *get_tag(TypedArray<StringName> path);
     
     void add_tag(StringName name, TagTreeItem* parent = nullptr);
+    void remove_tag(TagTreeItem* tag);
     void rename_tag(TagTreeItem tag, StringName new_name);
 
 protected:
@@ -25,5 +27,5 @@ protected:
 private:
     static TagDatabase *singleton;
 
-    TypedDictionary<StringName, TagTreeItem> nodes;
+    Dictionary nodes;
 };

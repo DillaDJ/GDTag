@@ -1,13 +1,11 @@
 #include "tag_database.hpp"
 
 #include "macros.h"
-#include "tag_tree_item.h"
-
 
 TagDatabase* TagDatabase::singleton = nullptr;
 
 void TagDatabase::initialize() {
-	nodes = TypedDictionary<StringName, TagTreeItem>();
+	nodes = Dictionary();
 }
 
 TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path) {
@@ -15,7 +13,8 @@ TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path) {
 		return nullptr;
 	}
 	
-	TagTreeItem *current_tag = cast_to<TagTreeItem>(nodes[path[0]]);
+	Variant v = nodes[path[0]];
+	TagTreeItem *current_tag = cast_to<TagTreeItem>(v);
 
 	for (size_t i = 0; i < path.size(); i++)
 	{
@@ -33,7 +32,7 @@ TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path) {
 	return current_tag;
 }
 
-void TagDatabase::add_tag(StringName name, TagTreeItem* parent = nullptr) {
+void TagDatabase::add_tag(StringName name, TagTreeItem* parent) {
 	if (parent == nullptr) {
 		if (!nodes.has(name)) {
 			return;
@@ -46,6 +45,9 @@ void TagDatabase::add_tag(StringName name, TagTreeItem* parent = nullptr) {
 	}
 
 	parent->add_child(name);
+}
+
+void TagDatabase::remove_tag(TagTreeItem *tag) {
 }
 
 void TagDatabase::rename_tag(TagTreeItem tag, StringName new_name) {

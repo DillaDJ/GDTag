@@ -1,6 +1,6 @@
 #include "tag_editor.hpp"
 
-#include "macros.h"
+#include "internal/macros.h"
 #include <godot_cpp/core/class_db.hpp>
 #include "internal/tag_database.hpp"
 #include "internal/tag_tree_item.h"
