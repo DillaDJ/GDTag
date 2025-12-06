@@ -4,7 +4,10 @@ The purpose of the system is to provide a nice way to easily handle string const
 
 ## Usage
 ### The Tag Editor
-Open the tag editor to start: Project>Tools>Open Tag Editor, the tag editor should now be docked on the top-left.
+Open the tag editor to start: Project>Tools>Open 
+![Path to the editor](https://github.com/DillaDJ/GDTag/doc/Editor-1.png)
+
+Tag Editor, the tag editor should now be docked on the top-left.
 The toolbar has three buttons, clicking the first button will add a tag. Left clicking tags will select them.
 Adding a tag with another tag selected will parent it to the selected tag.
 
@@ -12,7 +15,7 @@ To delete a tag, click either the second or third toolbar button with a tag sele
 The second button will delete a tag and preserve its children, whereas the third will delete it and all its children.
 
 ### GDScript
-To actually make use of our tags, we can do a little bit of scripting
+To actually make use of our tags, we do a little bit of scripting
 
 #### Tags
 TODO: Use the Tag type a single tag to an object
