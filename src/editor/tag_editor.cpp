@@ -52,10 +52,39 @@ void TagEditor::initialize() {
 
     root = tag_tree->create_item();
     main_vbox->add_child(tag_tree);
+
+    populate_tags();
 }
 
 void TagEditor::_bind_methods() {
     ClassDB::bind_method(D_METHOD("prompt_selected_tag_rename"), &TagEditor::prompt_selected_tag_rename);
+}
+
+void TagEditor::populate_tags() {
+    Array tags = database->get_tags();
+
+    for (size_t i = 0; i < tags.size(); i++)
+    {
+        TagTreeItem *tag = cast_to<TagTreeItem>(tags[i]);
+        TreeItem *item = tag_tree->create_item();
+        item->set_text(0, tag->get_name());
+
+        populate_children_recursive(item, tag);
+    }
+    
+}
+
+void TagEditor::populate_children_recursive(TreeItem *parent_item, TagTreeItem *parent_tag) {
+    Array children = parent_tag->get_children();
+
+    for (size_t i = 0; i < children.size(); i++)
+    {
+        TagTreeItem *tag = cast_to<TagTreeItem>(children[i]);
+        TreeItem *item = tag_tree->create_item(parent_item);
+        item->set_text(0, tag->get_name());
+        
+        populate_children_recursive(item, tag);
+    }
 }
 
 void TagEditor::add_tag() {
@@ -123,22 +152,22 @@ void TagEditor::update_tag_database() {
             UtilityFunctions::push_warning("New tag name is the same as the old name!");
             return;
         }
-
-        tag_path.pop_back();
-        tag_path.append(new_name);
-        TagTreeItem *next = database->get_tag(tag_path);
-        if (next != nullptr) {
-            UtilityFunctions::push_warning("There is already a tag with that name!");
-            selected_item->set_text(0, old_tag_name);
-            call_deferred(SNAME("prompt_selected_tag_rename"));
-            return;
-        }
-
-        current->set_name(new_name);
+        
+        UtilityFunctions::push_warning("There is already a tag with that name!");
+        selected_item->set_text(0, old_tag_name);
+        call_deferred(SNAME("prompt_selected_tag_rename"));
+        return;
+    }
+    
+    tag_path.pop_back();
+    tag_path.append(old_tag_name);
+    TagTreeItem *old = database->get_tag(tag_path);
+    if (old != nullptr) {
+        database->rename_tag(old, new_name);
         old_tag_name = "";
         return;
     }
-
+    
     old_tag_name = "";
 
     if (tag_path.size() <= 1) {

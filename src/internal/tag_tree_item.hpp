@@ -28,6 +28,9 @@ public:
     StringName get_name() { return name; }
     void set_name(StringName p_name) { name = p_name; }
 
+    void populate_children(Array children);
+    Array get_children_names_recursive();
+
 protected:
     static void _bind_methods();
 

@@ -40,5 +40,48 @@ void TagTreeItem::remove_child(StringName name) {
     children.erase(name);
 }
 
+void TagTreeItem::populate_children(Array loaded_tags) {
+    for (size_t i = 0; i < loaded_tags.size(); i++)
+	{
+		Variant tag = loaded_tags[i];
+		
+		if (tag.get_type() == Variant::Type::ARRAY) {
+			Array child_tags = (Array) tag; 
+			
+			StringName name = (StringName) child_tags[0];
+			add_child(name);
+			
+			TagTreeItem *loaded_tag = cast_to<TagTreeItem>(children[name]);
+			loaded_tag->populate_children(child_tags[1]);
+
+			return;
+		}
+
+		if (tag.get_type() == Variant::Type::STRING || tag.get_type() == Variant::Type::STRING_NAME) {
+			StringName name = (StringName) tag;
+			add_child(name);
+		}
+	}
+}
+
+Array TagTreeItem::get_children_names_recursive() {
+	Array tags = children.keys();
+
+    for (size_t i = 0; i < tags.size(); i++)
+	{
+		TagTreeItem *tag = cast_to<TagTreeItem>(children[tags[i]]);
+		Array children = tag->get_children_names_recursive();
+		
+		if (children.size() > 0) {
+            Array inner = Array();
+            inner.append(tags[i]);
+			inner.append(children);
+            tags[i] = inner;
+		}
+	}
+
+	return tags;
+}
+
 void TagTreeItem::_bind_methods() {
 }

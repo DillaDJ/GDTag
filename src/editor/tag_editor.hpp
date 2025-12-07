@@ -25,6 +25,9 @@ protected:
     static void _bind_methods();
 	
 private:
+    void populate_tags();
+    void populate_children_recursive(TreeItem *parent_item, class TagTreeItem *parent_tag);
+
 	void add_tag();
 
 	void prompt_delete_tag();
