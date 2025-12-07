@@ -12,7 +12,6 @@ using namespace godot;
 
 void TagPlugin::_enter_tree() {
     TagDatabase *database = TagDatabase::get_singleton();
-    database->initialize();
 
     add_tool_menu_item("Open Tag Editor Dock", callable_mp(this, &TagPlugin::OpenTagEditor));
 }

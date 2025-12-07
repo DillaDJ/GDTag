@@ -27,13 +27,9 @@ protected:
 private:
 	void add_tag();
 
-	void prompt_soft_delete_tag();
-	void prompt_hard_delete_tag();
 	void prompt_delete_tag();
 
 	void delete_selected_tag();
-
-	void reparent_children(TreeItem *selected_item);
 
     void prompt_selected_tag_rename();
     void update_tag_database();
@@ -51,7 +47,6 @@ private:
 
     Button *add_tag_btn;
     Button *del_tag_btn;
-    Button *del_tag_btn_hard;
 
     Tree *tag_tree;
 
@@ -60,5 +55,4 @@ private:
     ConfirmationDialog *delete_confirm;
 
     StringName old_tag_name;
-    bool hard_delete;
 };

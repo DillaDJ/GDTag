@@ -8,7 +8,7 @@
 #include "tag_plugin.hpp"
 
 #include "internal/tag_database.hpp"
-#include "internal/tag_tree_item.h"
+#include "internal/tag_tree_item.hpp"
 
 #include "editor/tag_editor.hpp"
 

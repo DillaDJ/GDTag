@@ -1,10 +1,8 @@
 #pragma once
 
 #include <godot_cpp/core/object.hpp>
-#include <godot_cpp/classes/object.hpp>
 #include <godot_cpp/variant/string_name.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
-#include "tag_tree_item.h"
 
 using namespace godot;
 
@@ -16,11 +14,12 @@ public:
 
     void initialize();
 
-    TagTreeItem *get_tag(TypedArray<StringName> path);
+    class TagTreeItem *get_tag(TypedArray<StringName> path);
     
-    void add_tag(StringName name, TagTreeItem* parent = nullptr);
-    void remove_tag(TagTreeItem* tag);
-    void rename_tag(TagTreeItem tag, StringName new_name);
+    void add_tag(StringName name, TagTreeItem *parent = nullptr);
+    void remove_tag(TagTreeItem *tag);
+    
+    void rename_tag(TagTreeItem *tag, StringName new_name);
 
 protected:
     static void _bind_methods();
@@ -28,5 +27,5 @@ protected:
 private:
     static TagDatabase *singleton;
 
-    Dictionary nodes;
+    Dictionary nodes; // StringName, TagTreeItem
 };
