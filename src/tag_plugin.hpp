@@ -8,7 +8,7 @@ class TagPlugin : public EditorPlugin {
     GDCLASS(TagPlugin, EditorPlugin);
   
 public:
-    TagPlugin() { }
+    TagPlugin();
     ~TagPlugin() { }
 
     void _enter_tree() override;
@@ -19,4 +19,6 @@ protected:
     
 private:
 	class TagEditor *editor;
+
+    class TagInspectorPlugin *tag_inspector;
 };

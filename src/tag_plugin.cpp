@@ -7,11 +7,17 @@
 
 #include "internal/tag_database.hpp"
 #include "editor/tag_editor.hpp"
+#include "editor/tag_inspector_plugin.h"
 
 using namespace godot;
 
+TagPlugin::TagPlugin() {
+    tag_inspector = memnew(TagInspectorPlugin);
+    add_inspector_plugin(tag_inspector);
+}
+
 void TagPlugin::_enter_tree() {
-    TagDatabase *database = TagDatabase::get_singleton();
+	TagDatabase *database = TagDatabase::get_singleton();
 
     add_tool_menu_item("Open Tag Editor Dock", callable_mp(this, &TagPlugin::OpenTagEditor));
 }

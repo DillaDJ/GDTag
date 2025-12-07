@@ -9,4 +9,7 @@ class Tag : public Object {
     
 protected:
     static void _bind_methods();
+
+private:
+    class TagTreeItem* linkedTag;
 };

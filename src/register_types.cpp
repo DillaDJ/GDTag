@@ -11,6 +11,8 @@
 #include "internal/tag_tree_item.hpp"
 
 #include "editor/tag_editor.hpp"
+#include "editor/tag_inspector_plugin.h"
+#include "editor/tag_property_editor.h"
 
 #include "tag/tag.h"
 #include "tag/tag_container.h"
@@ -27,11 +29,13 @@ void initialize(ModuleInitializationLevel p_level)
 			
 			GDREGISTER_CLASS(Tag);
 			GDREGISTER_CLASS(TagContainer);
-			GDREGISTER_CLASS(TagEditor);
-
+			
 			break;
-		
+			
 		case MODULE_INITIALIZATION_LEVEL_EDITOR:
+			GDREGISTER_INTERNAL_CLASS(TagInspectorPlugin);
+			GDREGISTER_INTERNAL_CLASS(TagPropertyEditor);
+			GDREGISTER_INTERNAL_CLASS(TagEditor);
 			GDREGISTER_INTERNAL_CLASS(TagPlugin);
 			EditorPlugins::add_by_type<TagPlugin>();
 

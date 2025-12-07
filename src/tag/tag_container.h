@@ -9,4 +9,5 @@ class TagContainer : public Object {
     
 protected:
     static void _bind_methods();
+
 };

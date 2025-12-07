@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=3 format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://root.gd" id="1_eb2wh"]
+[ext_resource type="Script" uid="uid://dnryqi700idk5" path="res://tagged_object.gd" id="2_j1pmf"]
 
 [node name="Root" type="Node"]
 script = ExtResource("1_eb2wh")
+
+[node name="TaggedObject" type="Node" parent="."]
+script = ExtResource("2_j1pmf")
