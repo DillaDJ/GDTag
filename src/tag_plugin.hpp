@@ -12,6 +12,7 @@ public:
     ~TagPlugin() { }
 
     void _enter_tree() override;
+    void _exit_tree() override;
     
 protected:
     static void _bind_methods() { }

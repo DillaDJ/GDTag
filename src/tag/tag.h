@@ -1,15 +1,15 @@
 #pragma once
 
-#include <godot_cpp/classes/object.hpp>
+#include <godot_cpp/classes/resource.hpp>
 
 using namespace godot;
 
-class Tag : public Object {
-    GDCLASS(Tag, Object);
+class Tag : public Resource {
+    GDCLASS(Tag, Resource);
     
 protected:
     static void _bind_methods();
 
 private:
-    class TagTreeItem* linkedTag;
+    class StringName linkedTagPath;
 };
