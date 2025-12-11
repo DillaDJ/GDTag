@@ -64,17 +64,21 @@ void TagDatabase::add_tag(StringName name, TagTreeItem* parent) {
 		tag_item->set_name(name);
 		nodes[name] = tag_item;
 		
+		emit_signal("tag_added");
 		// UtilityFunctions::print("Tag added");
 		return;
 	}
 
 	parent->add_child(name);
+	emit_signal("tag_added");
 	// UtilityFunctions::print("Tag added");
 }
 
 void TagDatabase::remove_tag(TagTreeItem *tag) {
 	remove_tag_recursive(tag);
 	write_to_file();
+
+	emit_signal("tag_removed");
 }
 
 void TagDatabase::rename_tag(TagTreeItem* tag, StringName new_name) {
@@ -87,6 +91,8 @@ void TagDatabase::rename_tag(TagTreeItem* tag, StringName new_name) {
 		tag->set_name(new_name);
 		nodes[new_name] = tag;
 		write_to_file();
+
+		emit_signal("tag_renamed");
 		// UtilityFunctions::print("Tag renamed");
 		return;
 	}
@@ -95,10 +101,15 @@ void TagDatabase::rename_tag(TagTreeItem* tag, StringName new_name) {
 	tag->set_name(new_name);
 	parent->add_child(tag);
 	write_to_file();
+
+	emit_signal("tag_renamed");
 	// UtilityFunctions::print("Tag renamed");
 }
 
 void TagDatabase::_bind_methods() {
+    ADD_SIGNAL(MethodInfo("tag_added"));
+    ADD_SIGNAL(MethodInfo("tag_renamed"));
+    ADD_SIGNAL(MethodInfo("tag_removed"));
 }
 
 void TagDatabase::remove_tag_recursive(TagTreeItem *tag) {

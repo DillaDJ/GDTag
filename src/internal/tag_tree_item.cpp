@@ -35,6 +35,7 @@ TagTreeItem *TagTreeItem::get_child(StringName name) {
 
 void TagTreeItem::remove_child(StringName name) {
     if (!children.has(name)) return;
+	
     TagTreeItem *tag = cast_to<TagTreeItem>(children[name]);
     tag->set_parent(nullptr);
     children.erase(name);

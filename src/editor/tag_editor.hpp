@@ -34,6 +34,7 @@ protected:
 private:
     void populate_tags();
     void populate_children_recursive(TreeItem *parent_item, class TagTreeItem *parent_tag);
+    void toggle_database_signal_connections(bool on);
     
     TreeItem *create_tree_item(TreeItem *parent = nullptr);
 
@@ -52,6 +53,7 @@ private:
     void rename_selected_tag(TypedArray<StringName> selected_tag_path, StringName new_name);
 
 	void empty_clicked(Vector2 position, MouseButton button);
+
 
     TypedArray<StringName> get_selected_tag_path();
     TypedArray<StringName> get_edited_tag_path();

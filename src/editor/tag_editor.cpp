@@ -12,6 +12,7 @@ TagEditor::TagEditor() {
     mode = TagEditorMode::READ;
 
     database = TagDatabase::get_singleton();
+    toggle_database_signal_connections(true);
 
     main_container = memnew(PanelContainer);
     main_container->set_anchors_preset(PRESET_FULL_RECT);
@@ -115,6 +116,19 @@ void TagEditor::populate_children_recursive(TreeItem *parent_item, TagTreeItem *
     }
 }
 
+void TagEditor::toggle_database_signal_connections(bool on) {
+    if (on) {
+        database->connect("tag_added", callable_mp(this, &TagEditor::refresh_tags));
+        database->connect("tag_renamed", callable_mp(this, &TagEditor::refresh_tags));
+        database->connect("tag_removed", callable_mp(this, &TagEditor::refresh_tags));
+        return;
+    }
+    
+    database->disconnect("tag_added", callable_mp(this, &TagEditor::refresh_tags));
+    database->disconnect("tag_renamed", callable_mp(this, &TagEditor::refresh_tags));
+    database->disconnect("tag_removed", callable_mp(this, &TagEditor::refresh_tags));
+}
+
 TreeItem *TagEditor::create_tree_item(TreeItem *parent) {
 	// UtilityFunctions::print("\nAdding new tag to " + (parent == root ? "root" : parent->get_text(0)) + "...");
     TreeItem *item = tag_tree->create_item(parent);
@@ -148,7 +162,7 @@ void TagEditor::toggle_select_tag() {
             checked_item->set_checked(1, true);
             return;
         }
-        
+
         emit_signal("tag_unselected", tag_path);
         UtilityFunctions::print("Unselect");
         checked_item = nullptr;
@@ -195,16 +209,19 @@ void TagEditor::prompt_delete_tag() {
 
 void TagEditor::delete_selected_tag() {
     TreeItem *selected_item = tag_tree->get_selected();
-
+    
     if (selected_item == nullptr) {
         return;
     }
-
+    
 	// UtilityFunctions::print("\nDeleting tag...");
     TagTreeItem *tag = database->get_tag(get_selected_tag_path());
+    toggle_database_signal_connections(false);
     
     database->remove_tag(tag);
     memdelete(selected_item);
+
+    toggle_database_signal_connections(true);
 }
 
 // Prevents attempt to rename on creating new tag
@@ -231,9 +248,12 @@ void TagEditor::prompt_selected_tag_rename() {
 }
 
 void TagEditor::update_tag_database() {
+    toggle_database_signal_connections(false);
+
     TreeItem *selected_item = tag_tree->get_edited();
     if (mode == TagEditorMode::SELECT && selected_item->is_selected(1)) {
 	    toggle_select_tag();
+        toggle_database_signal_connections(true);
         return;
     }
 
@@ -246,21 +266,25 @@ void TagEditor::update_tag_database() {
     if (current != nullptr) {
         if (new_name == old_tag_name) {
             UtilityFunctions::push_warning("New tag name is the same as the old name!");
+            toggle_database_signal_connections(true);
             return;
         }
         
         UtilityFunctions::push_warning("There is already a tag with that name!");
         selected_item->set_text(0, old_tag_name);
+        toggle_database_signal_connections(true);
         call_deferred(SNAME("prompt_selected_tag_rename"));
         return;
     }
     
     if (old_tag_name == SNAME("")) {
         add_new_tag(tag_path, new_name);
+        toggle_database_signal_connections(true);
         return;
     }
     
     rename_selected_tag(tag_path, new_name);
+    toggle_database_signal_connections(true);
 }
 
 void TagEditor::add_new_tag(TypedArray<StringName> selected_tag_path, StringName tag_name) {

@@ -38,4 +38,5 @@ void TagPlugin::OpenTagEditor() {
     }
 
     add_control_to_dock(EditorPlugin::DOCK_SLOT_LEFT_UR, editor);
+    editor->refresh_tags();
 }
