@@ -20,6 +20,8 @@ public:
     void add_tag(StringName name, TagTreeItem *parent = nullptr);
     void remove_tag(TagTreeItem *tag);
     void rename_tag(TagTreeItem *tag, StringName new_name);
+
+    void save() { write_to_file(); }
     
 protected:
     static void _bind_methods();

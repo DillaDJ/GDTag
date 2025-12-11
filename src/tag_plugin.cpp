@@ -31,7 +31,6 @@ void TagPlugin::_exit_tree() {
 void TagPlugin::OpenTagEditor() {
     if (editor == nullptr) {
         editor = memnew(TagEditor);
-        editor->initialize();
     }
     
     if (editor->get_parent() != nullptr) {

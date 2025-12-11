@@ -23,10 +23,10 @@ void TagDatabase::initialize() {
 }
 
 TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path) {
-	UtilityFunctions::print("Getting tag with path: " + UtilityFunctions::str(path));
+	// UtilityFunctions::print("Getting tag with path: " + UtilityFunctions::str(path));
 
 	if (path.size() == 0 || !nodes.has(path[0])) {
-		UtilityFunctions::print("Did not find tag...");
+		// UtilityFunctions::print("Did not find tag...");
 		return nullptr;
 	}
 	
@@ -42,17 +42,17 @@ TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path) {
 		current_tag = current_tag->get_child(path[i]);
 
 		if (current_tag == nullptr) {
-			UtilityFunctions::print("Did not find tag...");
+			// UtilityFunctions::print("Did not find tag...");
 			return nullptr;
 		}
 	}
 
-	UtilityFunctions::print("Found tag: " + (current_tag->get_name()));
+	// UtilityFunctions::print("Found tag: " + (current_tag->get_name()));
 	return current_tag;
 }
 
 void TagDatabase::add_tag(StringName name, TagTreeItem* parent) {
-	UtilityFunctions::print("Adding tag: " + name);
+	// UtilityFunctions::print("Adding tag: " + name);
 
 	if (parent == nullptr) {
 		if (nodes.has(name)) {
@@ -63,14 +63,13 @@ void TagDatabase::add_tag(StringName name, TagTreeItem* parent) {
 		tag_item->set_parent(nullptr);
 		tag_item->set_name(name);
 		nodes[name] = tag_item;
-		write_to_file();
-		UtilityFunctions::print("Tag added");
+		
+		// UtilityFunctions::print("Tag added");
 		return;
 	}
 
 	parent->add_child(name);
-	write_to_file();
-	UtilityFunctions::print("Tag added");
+	// UtilityFunctions::print("Tag added");
 }
 
 void TagDatabase::remove_tag(TagTreeItem *tag) {
@@ -81,14 +80,14 @@ void TagDatabase::remove_tag(TagTreeItem *tag) {
 void TagDatabase::rename_tag(TagTreeItem* tag, StringName new_name) {
 	TagTreeItem *parent = tag->get_parent();
     StringName name = tag->get_name();
-	UtilityFunctions::print("Renaming tag: " + name);
+	// UtilityFunctions::print("Renaming tag: " + name);
 
 	if (parent == nullptr) {
 		nodes.erase(name);
 		tag->set_name(new_name);
 		nodes[new_name] = tag;
 		write_to_file();
-		UtilityFunctions::print("Tag renamed");
+		// UtilityFunctions::print("Tag renamed");
 		return;
 	}
 
@@ -96,7 +95,7 @@ void TagDatabase::rename_tag(TagTreeItem* tag, StringName new_name) {
 	tag->set_name(new_name);
 	parent->add_child(tag);
 	write_to_file();
-	UtilityFunctions::print("Tag renamed");
+	// UtilityFunctions::print("Tag renamed");
 }
 
 void TagDatabase::_bind_methods() {
@@ -105,32 +104,32 @@ void TagDatabase::_bind_methods() {
 void TagDatabase::remove_tag_recursive(TagTreeItem *tag) {
 	TagTreeItem *parent = tag->get_parent();
     StringName name = tag->get_name();
-	UtilityFunctions::print("Removing tag: " + name);
+	// UtilityFunctions::print("Removing tag: " + name);
 
 	Array children = tag->get_children();
 	for (size_t i = 0; i < children.size(); i++)
 	{
 		TagTreeItem *child_tag = cast_to<TagTreeItem>(children[i]);
-		UtilityFunctions::print("Found child tag: " + child_tag->get_name());
+		// UtilityFunctions::print("Found child tag: " + child_tag->get_name());
 		remove_tag_recursive(child_tag);
 	}	
 	
 	if (parent == nullptr) {
 		nodes.erase(name);
 		memdelete(tag);
-		UtilityFunctions::print("Tag deleted");
+		// UtilityFunctions::print("Tag deleted");
 		return;
 	}
 
 	parent->remove_child(name);
 	memdelete(tag);
-	UtilityFunctions::print("Inner Tag deleted");
+	// UtilityFunctions::print("Inner Tag deleted");
 }
 
 void TagDatabase::read_from_file() {
 	Ref<FileAccess> file = FileAccess::open("res://bin/tag_database.json", FileAccess::READ);
 	if (file == nullptr) {
-		UtilityFunctions::print("Could not open tag_database.json");
+		// UtilityFunctions::print("Could not open tag_database.json");
 		return;
 	}
 

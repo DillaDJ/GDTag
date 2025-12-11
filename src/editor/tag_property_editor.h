@@ -21,8 +21,14 @@ protected:
     static void _bind_methods();
 
 private:
-    MarginContainer *container;
+    void toggle_tag_editor();
+
+    void select_tag(TypedArray<StringName> tag_path);
+
+    VBoxContainer *container;
     HBoxContainer *h_layout;
     Label *property_name;
     Button *select_button;
+
+    class TagEditor *editor;
 };
