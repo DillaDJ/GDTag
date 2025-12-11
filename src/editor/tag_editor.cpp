@@ -59,6 +59,7 @@ TagEditor::TagEditor() {
 
 void TagEditor::_bind_methods() {
     ClassDB::bind_method(D_METHOD("prompt_selected_tag_name"), &TagEditor::prompt_selected_tag_name);
+    ClassDB::bind_method(D_METHOD("prompt_selected_tag_rename"), &TagEditor::prompt_selected_tag_rename);
 
     ADD_SIGNAL(MethodInfo("tag_selected", PropertyInfo(Variant::ARRAY, "tag_path")));
     ADD_SIGNAL(MethodInfo("tag_unselected", PropertyInfo(Variant::ARRAY, "tag_path")));
@@ -170,14 +171,14 @@ void TagEditor::toggle_select_tag() {
     }
     
     if (mode == TagEditorMode::SELECT) {
-        unselect_recursive(root);
+        uncheck_recursive(root);
         checked_item->set_checked(1, true);
     }
     
     emit_signal("tag_selected", tag_path);
 }
 
-void TagEditor::unselect_recursive(TreeItem *item) {
+void TagEditor::uncheck_recursive(TreeItem *item) {
     if (item->get_child_count() == 0) {
         return;
     }
@@ -185,12 +186,9 @@ void TagEditor::unselect_recursive(TreeItem *item) {
     TreeItem *child = item->get_first_child();
 
     while (child != nullptr) {
-        if (child->is_checked(1)) {
-            child->set_checked(1, false);
-        }
-
-        unselect_recursive(child);
-        child = item->get_next();
+        child->set_checked(1, false);
+        uncheck_recursive(child);
+        child = child->get_next();
     }
 }
 
@@ -263,6 +261,15 @@ void TagEditor::update_tag_database() {
     TypedArray<StringName> tag_path = get_edited_tag_path();
     TagTreeItem *current = database->get_tag(tag_path);
     
+    if (new_name == SNAME("")) {
+        UtilityFunctions::push_warning("Empty tags are forbidden!");
+
+        selected_item->set_text(0, old_tag_name);
+        call_deferred(SNAME("prompt_selected_tag_rename"));
+        toggle_database_signal_connections(true);
+        return;
+    }
+    
     if (current != nullptr) {
         if (new_name == old_tag_name) {
             UtilityFunctions::push_warning("New tag name is the same as the old name!");
@@ -273,11 +280,18 @@ void TagEditor::update_tag_database() {
         UtilityFunctions::push_warning("There is already a tag with that name!");
         selected_item->set_text(0, old_tag_name);
         toggle_database_signal_connections(true);
-        call_deferred(SNAME("prompt_selected_tag_rename"));
+
+        if (old_tag_name == SNAME("")) {
+            call_deferred(SNAME("prompt_selected_tag_name"));
+        }
+        else {
+            call_deferred(SNAME("prompt_selected_tag_rename"));
+        }
+
         return;
     }
     
-    if (old_tag_name == SNAME("")) {
+    if (old_tag_name == SNAME("")) {        
         add_new_tag(tag_path, new_name);
         toggle_database_signal_connections(true);
         return;
@@ -346,6 +360,5 @@ TypedArray<StringName> TagEditor::get_tag_path(TreeItem *item) {
     }
 
     path.reverse();
-
 	return path;
 }

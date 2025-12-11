@@ -12,7 +12,7 @@ bool TagInspectorPlugin::_parse_property(Object *p_object, Variant::Type p_type,
     TypedArray<Dictionary> property_list = p_object->get_property_list();
     if (p_hint_string == Tag::get_class_static()) {        
         TagPropertyEditor* tag_editor = memnew(TagPropertyEditor);
-        tag_editor->set_property_name(p_name);
+        tag_editor->initialize(p_object, p_name);
         add_custom_control(tag_editor);
         return true;
     }

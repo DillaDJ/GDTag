@@ -28,6 +28,9 @@ public:
     StringName get_name() { return name; }
     void set_name(StringName p_name) { name = p_name; }
 
+    TypedArray<StringName> get_path();
+    StringName get_path_combined();
+
     void populate_children(Array children);
     Array get_children_names_recursive();
 

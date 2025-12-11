@@ -6,6 +6,7 @@
 #include <godot_cpp/classes/label.hpp>
 #include <godot_cpp/classes/button.hpp>
 #include <godot_cpp/classes/popup_menu.hpp>
+#include <godot_cpp/variant/string.hpp>
 
 using namespace godot;
 
@@ -15,7 +16,7 @@ class TagPropertyEditor : public VBoxContainer {
 public:
     TagPropertyEditor();
 
-    void set_property_name(String name);
+    void initialize(Object *owner, String p_property_name);
 
 protected:
     static void _bind_methods();
@@ -23,12 +24,17 @@ protected:
 private:
     void toggle_tag_editor();
 
+    class Tag *get_tag();
+
     void select_tag(TypedArray<StringName> tag_path);
 
     VBoxContainer *container;
     HBoxContainer *h_layout;
-    Label *property_name;
+    Label *property_label;
     Button *select_button;
 
     class TagEditor *editor;
+
+    Object *owner;
+    String property_name;
 };

@@ -171,7 +171,7 @@ void TagDatabase::load_tags(Array loaded_tags) {
 			TagTreeItem *loaded_tag = cast_to<TagTreeItem>(nodes[name]);
 			loaded_tag->populate_children(child_tags[1]);
 
-			return;
+			continue;
 		}
 
 		if (tag.get_type() == Variant::Type::STRING || tag.get_type() == Variant::Type::STRING_NAME) {

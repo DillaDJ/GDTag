@@ -1,7 +1,10 @@
 #include "tag_property_editor.h"
 
-#include "tag_editor.hpp"
+#include "internal/macros.h"
 #include "internal/tag_database.hpp"
+#include "internal/tag_tree_item.hpp"
+#include "tag_editor.hpp"
+#include "tag/tag.h"
 
 TagPropertyEditor::TagPropertyEditor() {
     container = memnew(VBoxContainer);
@@ -11,9 +14,10 @@ TagPropertyEditor::TagPropertyEditor() {
     h_layout = memnew(HBoxContainer);
     container->add_child(h_layout);
     
-    property_name = memnew(Label);
-    property_name->set_h_size_flags(SIZE_EXPAND | SIZE_FILL);
-    h_layout->add_child(property_name);
+    property_label = memnew(Label);
+    property_label->set_h_size_flags(SIZE_EXPAND | SIZE_FILL);
+    property_label->set_stretch_ratio(0.5f);
+    h_layout->add_child(property_label);
     
     select_button = memnew(Button);
 	select_button->connect("pressed", callable_mp(this, &TagPropertyEditor::toggle_tag_editor));
@@ -33,8 +37,18 @@ TagPropertyEditor::TagPropertyEditor() {
     container->add_child(editor);
 }
 
-void TagPropertyEditor::set_property_name(String name) {
-    property_name->set_text(name.capitalize());
+void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
+    owner = p_owner;
+    property_name = p_property_name;
+
+    property_label->set_text(property_name.capitalize());
+    Tag *tag = get_tag();
+
+    if (tag == nullptr) {
+        return;
+    }
+
+    select_button->set_text(tag->get_linked_path());
 }
 
 void TagPropertyEditor::_bind_methods() {
@@ -49,6 +63,42 @@ void TagPropertyEditor::toggle_tag_editor() {
     editor->refresh_tags();
 }
 
+Tag *TagPropertyEditor::get_tag() {
+    Variant var = owner->get(property_name);
+    if (var.get_type() == Variant::NIL) {
+        UtilityFunctions::print("No tag object!");
+        return nullptr;
+    }
+
+    UtilityFunctions::print("Has tag object!");
+    Tag *tag = cast_to<Tag>(var);
+    
+    if (tag == nullptr) {
+        UtilityFunctions::push_error("Mismatched resource!");
+        return nullptr;
+    }
+
+    return tag;
+}
+
 void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path) {
-    UtilityFunctions::print(tag_path);
+    TagDatabase *database = TagDatabase::get_singleton();
+    TagTreeItem *tag_tree_item = database->get_tag(tag_path);
+    StringName combined_path = "";
+    Tag *tag = get_tag();
+
+    if (tag == nullptr) {
+
+        for (size_t i = 0; i < tag_path.size(); i++)
+        {
+            StringName path_element = (StringName) tag_path[i];
+            combined_path = combined_path + path_element + SNAME("/");
+        }
+
+        UtilityFunctions::print(combined_path);
+        return;
+    }
+
+    tag->set_tag(tag_tree_item);
+    select_button->set_text(tag->get_linked_path());
 }

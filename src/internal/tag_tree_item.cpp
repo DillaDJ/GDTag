@@ -41,8 +41,34 @@ void TagTreeItem::remove_child(StringName name) {
     children.erase(name);
 }
 
+TypedArray<StringName> TagTreeItem::get_path() {
+    TypedArray<StringName> path = TypedArray<StringName>();
+	TagTreeItem *current;
+        
+    while (current != nullptr) {
+        path.append(current->get_name());
+        current = current->get_parent();
+    }
+
+    path.reverse();
+	return path;
+}
+
+StringName TagTreeItem::get_path_combined() {
+	StringName combined = "";
+
+	TypedArray<StringName> path = get_path();
+	for (size_t i = 0; i < path.size(); i++)
+	{
+		StringName path_element = (StringName) path[i];
+		combined = combined + path_element;
+	}
+
+	return combined;
+}
+
 void TagTreeItem::populate_children(Array loaded_tags) {
-    for (size_t i = 0; i < loaded_tags.size(); i++)
+	for (size_t i = 0; i < loaded_tags.size(); i++)
 	{
 		Variant tag = loaded_tags[i];
 		

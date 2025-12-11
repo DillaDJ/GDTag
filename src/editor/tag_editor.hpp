@@ -40,7 +40,7 @@ private:
 
 	void add_tag();
     void toggle_select_tag();
-    void unselect_recursive(TreeItem *item);
+    void uncheck_recursive(TreeItem *item);
 
 	void prompt_delete_tag();
 	void delete_selected_tag();
