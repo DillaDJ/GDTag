@@ -28,7 +28,6 @@ TagPropertyEditor::TagPropertyEditor() {
     select_button->set_theme_type_variation("InspectorActionButton");
     select_button->set_h_size_flags(SIZE_EXPAND | SIZE_FILL);
     select_button->set_toggle_mode(true);
-    select_button->set_text("Select Tag");
 
     h_layout->add_child(select_button);
 
@@ -49,10 +48,16 @@ void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
     get_tag();
 
     if (tag == nullptr) {
+        select_button->set_text("Select Tag");
         return;
     }
 
     StringName name = tag->get_tag_path();
+    if (name == SNAME("")) {
+        select_button->set_text("Select Tag");
+        return;
+    }
+
     select_button->set_text(name);
 }
 
@@ -106,6 +111,7 @@ void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr) {
     StringName old_tag_path = tag->get_tag_path();
     TypedArray<StringName> old_path_arr = TagHelpers::split_path(old_tag_path);
     
+    // UtilityFunctions::print("Setting tag path: '" + tag_path + "'");
     undo_redo->add_do_method(tag, "set_tag_path", tag_path);
     undo_redo->add_undo_method(tag, "set_tag_path", old_tag_path);
 

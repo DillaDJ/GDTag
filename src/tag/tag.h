@@ -10,7 +10,9 @@ class Tag : public Resource {
 public:    
     class TagTreeItem *get_tag();
 
-    void set_tag_path(StringName path) { tag_path = path; }
+    bool match(Tag *tag);
+
+    void set_tag_path(StringName path);
     StringName get_tag_path() { return tag_path; }
 
 protected:
