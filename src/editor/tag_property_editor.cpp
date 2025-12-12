@@ -1,8 +1,12 @@
 #include "tag_property_editor.h"
 
-#include "internal/macros.h"
+#include <godot_cpp/classes/editor_interface.hpp>
+#include <godot_cpp/classes/editor_undo_redo_manager.hpp>
+
+#include "internal/helpers.hpp"
 #include "internal/tag_database.hpp"
 #include "internal/tag_tree_item.hpp"
+
 #include "tag_editor.hpp"
 #include "tag/tag.h"
 
@@ -42,13 +46,14 @@ void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
     property_name = p_property_name;
 
     property_label->set_text(property_name.capitalize());
-    Tag *tag = get_tag();
+    get_tag();
 
     if (tag == nullptr) {
         return;
     }
 
-    select_button->set_text(tag->get_linked_path());
+    StringName name = tag->get_tag_path();
+    select_button->set_text(name);
 }
 
 void TagPropertyEditor::_bind_methods() {
@@ -59,46 +64,59 @@ void TagPropertyEditor::toggle_tag_editor() {
     editor->set_visible(visible);
 
     if (!visible) { return; }
-
     editor->refresh_tags();
-}
-
-Tag *TagPropertyEditor::get_tag() {
-    Variant var = owner->get(property_name);
-    if (var.get_type() == Variant::NIL) {
-        UtilityFunctions::print("No tag object!");
-        return nullptr;
-    }
-
-    UtilityFunctions::print("Has tag object!");
-    Tag *tag = cast_to<Tag>(var);
     
     if (tag == nullptr) {
-        UtilityFunctions::push_error("Mismatched resource!");
-        return nullptr;
-    }
-
-    return tag;
-}
-
-void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path) {
-    TagDatabase *database = TagDatabase::get_singleton();
-    TagTreeItem *tag_tree_item = database->get_tag(tag_path);
-    StringName combined_path = "";
-    Tag *tag = get_tag();
-
-    if (tag == nullptr) {
-
-        for (size_t i = 0; i < tag_path.size(); i++)
-        {
-            StringName path_element = (StringName) tag_path[i];
-            combined_path = combined_path + path_element + SNAME("/");
-        }
-
-        UtilityFunctions::print(combined_path);
         return;
     }
 
-    tag->set_tag(tag_tree_item);
-    select_button->set_text(tag->get_linked_path());
+    TypedArray<StringName> path_arr = TagHelpers::split_path(tag->get_tag_path());
+    editor->check_tag(path_arr);
+}
+
+void TagPropertyEditor::get_tag() {
+    if (tag != nullptr) {
+        return;
+    }
+    
+    Variant var = owner->get(property_name);
+    if (var.get_type() == Variant::NIL) {
+        return;
+    }
+
+    tag = cast_to<Tag>(var);
+}
+
+void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr) {
+    TagDatabase *database = TagDatabase::get_singleton();
+    StringName tag_path = TagHelpers::merge_path(tag_path_arr);
+    
+    EditorUndoRedoManager *undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
+    undo_redo->create_action("Set tag");
+    
+    if (tag == nullptr) {       
+        Ref<Tag> ref;
+        ref.instantiate();
+        tag = ref.ptr();
+        
+        undo_redo->add_do_property(owner, property_name, ref);
+        undo_redo->add_undo_property(owner, property_name, nullptr);
+    }
+    
+    StringName old_tag_path = tag->get_tag_path();
+    TypedArray<StringName> old_path_arr = TagHelpers::split_path(old_tag_path);
+    
+    undo_redo->add_do_method(tag, "set_tag_path", tag_path);
+    undo_redo->add_undo_method(tag, "set_tag_path", old_tag_path);
+
+    undo_redo->add_do_method(select_button, "set_text", tag_path);
+    undo_redo->add_undo_method(select_button, "set_text", old_tag_path == SNAME("") ? "Select Tag" : old_tag_path);
+
+    undo_redo->add_do_method(editor, "uncheck_tags");
+    undo_redo->add_undo_method(editor, "uncheck_tags");
+
+    undo_redo->add_do_method(editor, "check_tag", tag_path_arr);
+    undo_redo->add_undo_method(editor, "check_tag", old_path_arr);
+
+    undo_redo->commit_action();
 }

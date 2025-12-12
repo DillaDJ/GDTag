@@ -24,9 +24,9 @@ protected:
 private:
     void toggle_tag_editor();
 
-    class Tag *get_tag();
+    void get_tag();
 
-    void select_tag(TypedArray<StringName> tag_path);
+    void select_tag(TypedArray<StringName> tag_path_arr);
 
     VBoxContainer *container;
     HBoxContainer *h_layout;
@@ -37,4 +37,6 @@ private:
 
     Object *owner;
     String property_name;
+
+    class Tag *tag;
 };

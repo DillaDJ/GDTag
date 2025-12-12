@@ -1,4 +1,6 @@
 #include "tag_tree_item.hpp"
+#include "internal/helpers.hpp"
+#include <godot_cpp/variant/utility_functions.hpp>
 
 TagTreeItem::TagTreeItem() {
     children = Dictionary();
@@ -41,30 +43,30 @@ void TagTreeItem::remove_child(StringName name) {
     children.erase(name);
 }
 
-TypedArray<StringName> TagTreeItem::get_path() {
-    TypedArray<StringName> path = TypedArray<StringName>();
-	TagTreeItem *current;
+TypedArray<StringName> TagTreeItem::get_path_arr() {
+    TypedArray<StringName> path_arr = TypedArray<StringName>();
+	TagTreeItem *current = this;
         
     while (current != nullptr) {
-        path.append(current->get_name());
+        path_arr.append(current->get_name());
         current = current->get_parent();
     }
 
-    path.reverse();
-	return path;
+    path_arr.reverse();
+	return path_arr;
 }
 
-StringName TagTreeItem::get_path_combined() {
-	StringName combined = "";
+StringName TagTreeItem::get_path() {
+	StringName path = "";
 
-	TypedArray<StringName> path = get_path();
-	for (size_t i = 0; i < path.size(); i++)
+	TypedArray<StringName> path_arr = get_path_arr();
+	for (size_t i = 0; i < path_arr.size(); i++)
 	{
-		StringName path_element = (StringName) path[i];
-		combined = combined + path_element;
+		StringName path_element = (StringName) path_arr[i] + SNAME("/");
+		path = path + path_element;
 	}
 
-	return combined;
+	return path;
 }
 
 void TagTreeItem::populate_children(Array loaded_tags) {

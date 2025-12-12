@@ -14,7 +14,7 @@ public:
 
     void initialize();
 
-    class TagTreeItem *get_tag(TypedArray<StringName> path);
+    class TagTreeItem *get_tag(TypedArray<StringName> path_arr);
     class Array get_tags() { return nodes.values(); }
     
     void add_tag(StringName name, TagTreeItem *parent = nullptr);

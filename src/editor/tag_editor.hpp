@@ -28,6 +28,9 @@ public:
 
     void refresh_tags();
 
+    void check_tag(TypedArray<StringName> path_arr);
+    void uncheck_tags();
+
 protected:
     static void _bind_methods();
 	
@@ -49,15 +52,14 @@ private:
     void prompt_selected_tag_rename();
     void update_tag_database();
 
-    void add_new_tag(TypedArray<StringName> selected_tag_path, StringName tag_name);
-    void rename_selected_tag(TypedArray<StringName> selected_tag_path, StringName new_name);
+    void add_new_tag(TypedArray<StringName> selected_tag_path_arr, StringName tag_name);
+    void rename_selected_tag(TypedArray<StringName> selected_tag_path_arr, StringName new_name);
 
 	void empty_clicked(Vector2 position, MouseButton button);
 
-
-    TypedArray<StringName> get_selected_tag_path();
-    TypedArray<StringName> get_edited_tag_path();
-    TypedArray<StringName> get_tag_path(TreeItem *item);
+    TypedArray<StringName> get_selected_tag_path_arr();
+    TypedArray<StringName> get_edited_tag_path_arr();
+    TypedArray<StringName> get_tag_path_arr(TreeItem *item);
     
     TagEditorMode mode;
     

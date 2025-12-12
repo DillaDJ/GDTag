@@ -3,7 +3,7 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/classes/json.hpp>
-#include "macros.h"
+#include "internal/helpers.hpp"
 #include "tag_tree_item.hpp"
 
 TagDatabase* TagDatabase::singleton = nullptr;
@@ -22,24 +22,24 @@ void TagDatabase::initialize() {
 	read_from_file();
 }
 
-TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path) {
+TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
 	// UtilityFunctions::print("Getting tag with path: " + UtilityFunctions::str(path));
 
-	if (path.size() == 0 || !nodes.has(path[0])) {
+	if (path_arr.size() == 0 || !nodes.has(path_arr[0])) {
 		// UtilityFunctions::print("Did not find tag...");
 		return nullptr;
 	}
 	
-	Variant v = nodes[path[0]];
+	Variant v = nodes[path_arr[0]];
 	TagTreeItem *current_tag = Object::cast_to<TagTreeItem>(v);
 
-	for (size_t i = 0; i < path.size(); i++)
+	for (size_t i = 0; i < path_arr.size(); i++)
 	{
 		if (i == 0) {
 			continue;
 		}
 
-		current_tag = current_tag->get_child(path[i]);
+		current_tag = current_tag->get_child(path_arr[i]);
 
 		if (current_tag == nullptr) {
 			// UtilityFunctions::print("Did not find tag...");
