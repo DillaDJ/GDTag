@@ -1,4 +1,4 @@
-#include "tag_property_editor.h"
+#include "tag_property_editor.hpp"
 
 #include <godot_cpp/classes/editor_interface.hpp>
 #include <godot_cpp/classes/editor_undo_redo_manager.hpp>
@@ -40,6 +40,23 @@ TagPropertyEditor::TagPropertyEditor() {
     container->add_child(editor);
 }
 
+void TagPropertyEditor::_exit_tree() {
+    container->remove_child(editor);
+    memdelete(editor);
+    
+    h_layout->remove_child(select_button);
+    memdelete(select_button);
+
+    h_layout->remove_child(property_label);
+    memdelete(property_label);
+        
+    container->remove_child(h_layout);
+    memdelete(h_layout);
+
+    remove_child(container);
+    memdelete(container);
+}
+
 void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
     owner = p_owner;
     property_name = p_property_name;
@@ -59,9 +76,6 @@ void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
     }
 
     select_button->set_text(name);
-}
-
-void TagPropertyEditor::_bind_methods() {
 }
 
 void TagPropertyEditor::toggle_tag_editor() {

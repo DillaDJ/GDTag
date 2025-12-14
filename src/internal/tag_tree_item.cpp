@@ -6,9 +6,6 @@ TagTreeItem::TagTreeItem() {
     children = Dictionary();
 }
 
-TagTreeItem::~TagTreeItem() {
-}
-
 void TagTreeItem::add_child(StringName name) {
     if (children.has(name)) {
         return;
@@ -110,7 +107,4 @@ Array TagTreeItem::get_children_names_recursive() {
 	}
 
 	return tags;
-}
-
-void TagTreeItem::_bind_methods() {
 }

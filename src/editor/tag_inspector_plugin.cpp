@@ -1,5 +1,5 @@
 #include "tag_inspector_plugin.h"
-#include "tag_property_editor.h"
+#include "tag_property_editor.hpp"
 #include "tag/tag.h"
 
 bool TagInspectorPlugin::_can_handle(Object *p_object) const {

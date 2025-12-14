@@ -12,7 +12,7 @@
 
 #include "editor/tag_editor.hpp"
 #include "editor/tag_inspector_plugin.h"
-#include "editor/tag_property_editor.h"
+#include "editor/tag_property_editor.hpp"
 
 #include "tag/tag.h"
 #include "tag/tag_container.h"

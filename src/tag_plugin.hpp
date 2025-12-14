@@ -9,7 +9,7 @@ class TagPlugin : public EditorPlugin {
   
 public:
     TagPlugin();
-    ~TagPlugin() { }
+    ~TagPlugin();
 
     void _enter_tree() override;
     void _exit_tree() override;
@@ -21,5 +21,5 @@ protected:
 private:
 	class TagEditor *editor;
 
-    class TagInspectorPlugin *tag_inspector;
+    class Ref<class TagInspectorPlugin> tag_inspector;
 };

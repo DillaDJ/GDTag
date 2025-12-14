@@ -26,10 +26,11 @@ TagEditor::TagEditor() {
     main_container->add_child(main_vbox);
 
     header_container = memnew(PanelContainer);
+    main_vbox->add_child(header_container);
+    
     header_hbox = memnew(HBoxContainer);
     header_container->add_child(header_hbox);
-    main_vbox->add_child(header_container);
-
+    
     add_tag_btn = memnew(Button);
     add_tag_btn->set_theme_type_variation("FlatMenuButton");
 	add_tag_btn->connect("pressed", callable_mp(this, &TagEditor::add_tag));
@@ -59,6 +60,48 @@ TagEditor::TagEditor() {
     main_vbox->add_child(tree_container);
 }
 
+TagEditor::~TagEditor() {
+    database = nullptr;
+}
+
+void TagEditor::_enter_tree() {
+    add_tag_btn->set_button_icon(get_theme_icon(SNAME("Add"), SNAME("EditorIcons")));
+
+    main_container->add_theme_stylebox_override("panel",
+    get_theme_stylebox("sub_inspector_bg1", SNAME("EditorStyles")));
+
+    del_tag_btn->set_button_icon(get_theme_icon(SNAME("Remove"), SNAME("EditorIcons")));    
+}
+
+void TagEditor::_exit_tree() {
+    tree_container->remove_child(tag_tree);
+    memdelete(tag_tree);
+
+    main_vbox->remove_child(tree_container);
+    memdelete(tree_container);
+    
+    remove_child(delete_confirm);
+    memdelete(delete_confirm);
+
+	header_hbox->remove_child(del_tag_btn);
+    memdelete(del_tag_btn);
+
+	header_hbox->remove_child(add_tag_btn);
+    memdelete(add_tag_btn);
+
+    header_container->remove_child(header_hbox);
+    memdelete(header_hbox);
+
+    main_vbox->remove_child(header_container);
+    memdelete(header_container);
+
+    main_container->remove_child(main_vbox);
+    memdelete(main_vbox);
+    
+    remove_child(main_container);
+    memdelete(main_container);
+}
+
 void TagEditor::_bind_methods() {
     ClassDB::bind_method(D_METHOD("prompt_selected_tag_name"), &TagEditor::prompt_selected_tag_name);
     ClassDB::bind_method(D_METHOD("prompt_selected_tag_rename"), &TagEditor::prompt_selected_tag_rename);
@@ -67,15 +110,6 @@ void TagEditor::_bind_methods() {
 
     ADD_SIGNAL(MethodInfo("tag_selected", PropertyInfo(Variant::ARRAY, "tag_path")));
     ADD_SIGNAL(MethodInfo("tag_unselected", PropertyInfo(Variant::ARRAY, "tag_path")));
-}
-
-void TagEditor::_enter_tree() {
-    add_tag_btn->set_button_icon(get_theme_icon(SNAME("Add"), SNAME("EditorIcons")));
-
-    main_container->add_theme_stylebox_override("panel",
-        get_theme_stylebox("sub_inspector_bg1", SNAME("EditorStyles")));
-
-    del_tag_btn->set_button_icon(get_theme_icon(SNAME("Remove"), SNAME("EditorIcons")));    
 }
 
 void TagEditor::set_mode(TagEditorMode p_mode) {
@@ -90,7 +124,7 @@ void TagEditor::set_mode(TagEditorMode p_mode) {
 void TagEditor::refresh_tags() {
     tag_tree->clear();
     root = tag_tree->create_item();
-    populate_tags();
+    populate_tags_recursive(nullptr, nullptr);
 }
 
 void TagEditor::check_tag(TypedArray<StringName> path_arr) {
@@ -130,31 +164,17 @@ void TagEditor::uncheck_tags() {
     uncheck_recursive(root);
 }
 
-void TagEditor::populate_tags() {
-	Array tags = database->get_tags();
-
-    for (size_t i = 0; i < tags.size(); i++)
-    {
-        TagTreeItem *tag = cast_to<TagTreeItem>(tags[i]);
-        
-        TreeItem *item = create_tree_item(root);
-        item->set_text(0, tag->get_name());
-
-        populate_children_recursive(item, tag);
-    }
-}
-
-void TagEditor::populate_children_recursive(TreeItem *parent_item, TagTreeItem *parent_tag) {
-    Array children = parent_tag->get_children();
+void TagEditor::populate_tags_recursive(TreeItem *parent_item, TagTreeItem *parent_tag) {
+    Array children = parent_tag == nullptr ? database->get_tags() : parent_tag->get_children();
 
     for (size_t i = 0; i < children.size(); i++)
     {
         TagTreeItem *tag = cast_to<TagTreeItem>(children[i]);
 
-        TreeItem *item = create_tree_item(parent_item);
+        TreeItem *item = create_tree_item(parent_item == nullptr ? root : parent_item);
         item->set_text(0, tag->get_name());
         
-        populate_children_recursive(item, tag);
+        populate_tags_recursive(item, tag);
     }
 }
 
@@ -172,7 +192,7 @@ void TagEditor::toggle_database_signal_connections(bool on) {
 }
 
 TreeItem *TagEditor::create_tree_item(TreeItem *parent) {
-	// UtilityFunctions::print("\nAdding new tag to " + (parent == root ? "root" : parent->get_text(0)) + "...");
+// 	// UtilityFunctions::print("\nAdding new tag to " + (parent == root ? "root" : parent->get_text(0)) + "...");
     TreeItem *item = tag_tree->create_item(parent);
     
     if (mode != TagEditorMode::READ) {
@@ -207,7 +227,6 @@ void TagEditor::toggle_select_tag() {
         
         emit_signal("tag_unselected", path_arr);
         UtilityFunctions::print("Unselect");
-        checked_item = nullptr;
         return;
     }
     
@@ -290,13 +309,14 @@ void TagEditor::update_tag_database() {
     toggle_database_signal_connections(false);
 
     TreeItem *selected_item = tag_tree->get_edited();
-    if (mode == TagEditorMode::SELECT && selected_item->is_selected(1)) {
+    StringName new_name = selected_item->get_text(0);
+    
+    if (old_tag_name == SNAME("") && mode == TagEditorMode::SELECT && selected_item->is_selected(1)) {
 	    toggle_select_tag();
         toggle_database_signal_connections(true);
         return;
     }
 
-    StringName new_name = selected_item->get_text(0);
 	// UtilityFunctions::print("\nUpdating tags...");
 
     TypedArray<StringName> tag_path = get_edited_tag_path_arr();

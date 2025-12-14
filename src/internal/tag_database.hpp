@@ -12,7 +12,11 @@ class TagDatabase : public Object {
 public:
     static TagDatabase *get_singleton();
 
+    TagDatabase();
+    ~TagDatabase();
+    
     void initialize();
+    static void uninitialize();
 
     class TagTreeItem *get_tag(TypedArray<StringName> path_arr);
     class Array get_tags() { return nodes.values(); }

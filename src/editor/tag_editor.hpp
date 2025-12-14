@@ -20,9 +20,10 @@ class TagEditor : public Control {
 
 public:
     TagEditor();
-    ~TagEditor() { }
+    ~TagEditor();
 
     void _enter_tree() override;
+    void _exit_tree() override;
         
     void set_mode(TagEditorMode p_mode);
 
@@ -35,8 +36,7 @@ protected:
     static void _bind_methods();
 	
 private:
-    void populate_tags();
-    void populate_children_recursive(TreeItem *parent_item, class TagTreeItem *parent_tag);
+    void populate_tags_recursive(TreeItem *parent_item, class TagTreeItem *parent_tag);
     void toggle_database_signal_connections(bool on);
     
     TreeItem *create_tree_item(TreeItem *parent = nullptr);

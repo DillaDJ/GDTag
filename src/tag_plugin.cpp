@@ -13,12 +13,19 @@
 using namespace godot;
 
 TagPlugin::TagPlugin() {
+    TagDatabase *database = TagDatabase::get_singleton();
+}
+
+TagPlugin::~TagPlugin() {
+    TagDatabase::uninitialize();
 }
 
 void TagPlugin::_enter_tree() {
-	TagDatabase *database = TagDatabase::get_singleton();
-    
-    tag_inspector = memnew(TagInspectorPlugin);
+    editor = nullptr;
+
+    Ref<TagInspectorPlugin> plugin(memnew(TagInspectorPlugin));
+    tag_inspector = plugin;
+
     add_inspector_plugin(tag_inspector);
 
     add_tool_menu_item("Open Tag Editor Dock", callable_mp(this, &TagPlugin::OpenTagEditor));
@@ -26,6 +33,11 @@ void TagPlugin::_enter_tree() {
 
 void TagPlugin::_exit_tree() {
     remove_inspector_plugin(tag_inspector);
+    tag_inspector.unref();
+    
+    if (editor != nullptr) {
+        memdelete(editor);
+    }
 }
 
 void TagPlugin::OpenTagEditor() {

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=5 format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://root.gd" id="1_eb2wh"]
 [ext_resource type="Script" uid="uid://dnryqi700idk5" path="res://tagged_object.gd" id="2_j1pmf"]
@@ -9,9 +9,6 @@ tag_path = &"NewTag2/"
 [sub_resource type="Tag" id="Tag_t6etu"]
 tag_path = &"Crazy/"
 
-[sub_resource type="Tag" id="Tag_cpijt"]
-tag_path = &"NewTag2/"
-
 [node name="Root" type="Node"]
 script = ExtResource("1_eb2wh")
 
@@ -19,4 +16,3 @@ script = ExtResource("1_eb2wh")
 script = ExtResource("2_j1pmf")
 tag_a = SubResource("Tag_j1pmf")
 tag_b = SubResource("Tag_t6etu")
-tag_c = SubResource("Tag_cpijt")

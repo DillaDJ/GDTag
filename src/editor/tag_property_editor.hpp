@@ -15,11 +15,14 @@ class TagPropertyEditor : public VBoxContainer {
 
 public:
     TagPropertyEditor();
+    ~TagPropertyEditor() {}
+    
+    void _exit_tree() override;
 
     void initialize(Object *owner, String p_property_name);
 
 protected:
-    static void _bind_methods();
+    static void _bind_methods() { };
 
 private:
     void toggle_tag_editor();

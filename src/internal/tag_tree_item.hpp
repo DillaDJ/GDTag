@@ -10,7 +10,7 @@ class TagTreeItem : public Object {
     
 public:
     TagTreeItem();
-    ~TagTreeItem();
+    ~TagTreeItem() {};
     
     void clear() { children.clear(); }
 
@@ -35,12 +35,12 @@ public:
     Array get_children_names_recursive();
 
 protected:
-    static void _bind_methods();
+    static void _bind_methods() {};
 
 private:
     TagTreeItem *parent;
 
-    Dictionary children;
+    Dictionary children; // StringName, TagTreeItem
 
     StringName name;
 };

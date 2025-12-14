@@ -11,15 +11,34 @@ TagDatabase* TagDatabase::singleton = nullptr;
 TagDatabase *TagDatabase::get_singleton() {
 	if (singleton == nullptr) {
 		singleton = memnew(TagDatabase);
-    	singleton->initialize();
 	}
 
 	return singleton;
 }
 
+TagDatabase::TagDatabase() {
+    initialize();
+}
+
+TagDatabase::~TagDatabase() {
+	Array items = nodes.values();
+
+	for (size_t i = 0; i < items.size(); i++)
+	{
+		TagTreeItem *node = cast_to<TagTreeItem>(items[i]);
+		remove_tag_recursive(node);
+	}
+	
+}
+
 void TagDatabase::initialize() {
 	nodes = Dictionary();
 	read_from_file();
+}
+
+void TagDatabase::uninitialize() {
+	memdelete(singleton);
+	singleton = nullptr;
 }
 
 TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
@@ -30,8 +49,7 @@ TagTreeItem *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
 		return nullptr;
 	}
 	
-	Variant v = nodes[path_arr[0]];
-	TagTreeItem *current_tag = Object::cast_to<TagTreeItem>(v);
+	TagTreeItem *current_tag = Object::cast_to<TagTreeItem>(nodes[path_arr[0]]);
 
 	for (size_t i = 0; i < path_arr.size(); i++)
 	{
