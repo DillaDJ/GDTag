@@ -1,14 +1,32 @@
-[gd_scene load_steps=6 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=12 format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="Script" uid="uid://dnryqi700idk5" path="res://scripts/tag_comparing_object.gd" id="2_j1pmf"]
 [ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://scripts/container_comparing_object_.gd" id="3_cpijt"]
 [ext_resource type="Script" uid="uid://cdaax774hyo1l" path="res://scripts/container_comparing_tag_object.gd" id="3_t6etu"]
 
-[sub_resource type="Tag" id="Tag_j1pmf"]
+[sub_resource type="Tag" id="Tag_t6etu"]
 tag_path = &"Shallow/"
 
-[sub_resource type="Tag" id="Tag_t6etu"]
+[sub_resource type="Tag" id="Tag_cpijt"]
+tag_path = &"Shallow/"
+
+[sub_resource type="Tag" id="Tag_reemd"]
+tag_path = &"Shallow/"
+
+[sub_resource type="Tag" id="Tag_llj5n"]
+tag_path = &"Deep/"
+
+[sub_resource type="Tag" id="Tag_iuf4w"]
 tag_path = &"Deep/Parent/"
+
+[sub_resource type="Tag" id="Tag_paaqm"]
+tag_path = &"Deep/"
+
+[sub_resource type="Tag" id="Tag_m5l2a"]
+tag_path = &"Deep/Parent/"
+
+[sub_resource type="Tag" id="Tag_6sieb"]
+tag_path = &"Deep/Parent/Children/"
 
 [node name="Root" type="Node"]
 
@@ -16,13 +34,23 @@ tag_path = &"Deep/Parent/"
 
 [node name="TagMatchDemo" type="Node" parent="Tag"]
 script = ExtResource("2_j1pmf")
-tag_a = SubResource("Tag_j1pmf")
-tag_b = SubResource("Tag_t6etu")
+tag_a = SubResource("Tag_t6etu")
+tag_b = SubResource("Tag_cpijt")
 
-[node name="TagInheritanceDemo" type="Node" parent="Tag"]
+[node name="TagFailMatchDemo" type="Node" parent="Tag"]
 script = ExtResource("2_j1pmf")
-tag_a = SubResource("Tag_j1pmf")
-tag_b = SubResource("Tag_t6etu")
+tag_a = SubResource("Tag_reemd")
+tag_b = SubResource("Tag_llj5n")
+
+[node name="TagInheritanceMatchDemo" type="Node" parent="Tag"]
+script = ExtResource("2_j1pmf")
+tag_a = SubResource("Tag_iuf4w")
+tag_b = SubResource("Tag_paaqm")
+
+[node name="TagInheritanceFailDemo" type="Node" parent="Tag"]
+script = ExtResource("2_j1pmf")
+tag_a = SubResource("Tag_m5l2a")
+tag_b = SubResource("Tag_6sieb")
 
 [node name="TagContainer" type="Node" parent="."]
 

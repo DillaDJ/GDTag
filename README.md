@@ -51,3 +51,7 @@ To delete a tag, click the second toolbar button with a tag selected.
 This will delete the tag and all its children.
 
 To rename a tag, double click it.
+
+### Known issues
+## Dupliced objects with tags will reference the same tag.
+Since tags are Resources, a workaround is removing the reference in the new object under the scene file after duplication otherwise editing it will result in unwanted changes on the original object.
