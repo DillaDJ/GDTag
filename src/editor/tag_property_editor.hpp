@@ -41,5 +41,5 @@ private:
     Object *owner;
     String property_name;
 
-    class Tag *tag;
+    Ref<class Tag> tag;
 };

@@ -55,6 +55,8 @@ void TagPropertyEditor::_exit_tree() {
 
     remove_child(container);
     memdelete(container);
+
+    tag.unref();
 }
 
 void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
@@ -64,7 +66,7 @@ void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
     property_label->set_text(property_name.capitalize());
     get_tag();
 
-    if (tag == nullptr) {
+    if (tag.is_null()) {
         select_button->set_text("Select Tag");
         return;
     }
@@ -85,7 +87,7 @@ void TagPropertyEditor::toggle_tag_editor() {
     if (!visible) { return; }
     editor->refresh_tags();
     
-    if (tag == nullptr) {
+    if (tag.is_null()) {
         return;
     }
 
@@ -94,7 +96,7 @@ void TagPropertyEditor::toggle_tag_editor() {
 }
 
 void TagPropertyEditor::get_tag() {
-    if (tag != nullptr) {
+    if (tag.is_valid()) {
         return;
     }
     
@@ -103,7 +105,7 @@ void TagPropertyEditor::get_tag() {
         return;
     }
 
-    tag = cast_to<Tag>(var);
+    tag = var;
 }
 
 void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr) {
@@ -113,10 +115,9 @@ void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr) {
     EditorUndoRedoManager *undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
     undo_redo->create_action("Set tag");
     
-    if (tag == nullptr) {       
-        Ref<Tag> ref;
-        ref.instantiate();
-        tag = ref.ptr();
+    if (tag.is_null()) {       
+        Ref<Tag> ref(memnew(Tag));
+        tag = ref;
         
         undo_redo->add_do_property(owner, property_name, ref);
         undo_redo->add_undo_property(owner, property_name, nullptr);
@@ -126,8 +127,8 @@ void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr) {
     TypedArray<StringName> old_path_arr = TagHelpers::split_path(old_tag_path);
     
     // UtilityFunctions::print("Setting tag path: '" + tag_path + "'");
-    undo_redo->add_do_method(tag, "set_tag_path", tag_path);
-    undo_redo->add_undo_method(tag, "set_tag_path", old_tag_path);
+    undo_redo->add_do_method(tag.ptr(), "set_tag_path", tag_path);
+    undo_redo->add_undo_method(tag.ptr(), "set_tag_path", old_tag_path);
 
     undo_redo->add_do_method(select_button, "set_text", tag_path);
     undo_redo->add_undo_method(select_button, "set_text", old_tag_path == SNAME("") ? "Select Tag" : old_tag_path);
