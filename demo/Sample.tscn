@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://cdaax774hyo1l" path="res://scripts/container_comparing_tag_object.gd" id="3_t6etu"]
 
 [sub_resource type="Tag" id="Tag_j1pmf"]
-tag_path = &"Deep/Parent/Child/"
+tag_path = &"Shallow/"
 
 [sub_resource type="Tag" id="Tag_t6etu"]
 tag_path = &"Deep/Parent/"

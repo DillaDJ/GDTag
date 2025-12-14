@@ -310,12 +310,6 @@ void TagEditor::update_tag_database() {
 
     TreeItem *selected_item = tag_tree->get_edited();
     StringName new_name = selected_item->get_text(0);
-    
-    if (old_tag_name == SNAME("") && mode == TagEditorMode::SELECT && selected_item->is_selected(1)) {
-	    toggle_select_tag();
-        toggle_database_signal_connections(true);
-        return;
-    }
 
 	// UtilityFunctions::print("\nUpdating tags...");
 
@@ -323,6 +317,12 @@ void TagEditor::update_tag_database() {
     TagTreeItem *current = database->get_tag(tag_path);
     
     if (new_name == SNAME("")) {
+        if (mode == TagEditorMode::SELECT && selected_item->is_selected(1)) {
+            toggle_select_tag();
+            toggle_database_signal_connections(true);
+            return;
+        }
+
         UtilityFunctions::push_warning("Empty tags are forbidden!");
 
         selected_item->set_text(0, old_tag_name);
@@ -334,6 +334,12 @@ void TagEditor::update_tag_database() {
     if (current != nullptr) {
         if (new_name == old_tag_name) {
             UtilityFunctions::push_warning("New tag name is the same as the old name!");
+            toggle_database_signal_connections(true);
+            return;
+        }
+        
+        if (mode == TagEditorMode::SELECT && selected_item->is_selected(1)) {
+            toggle_select_tag();
             toggle_database_signal_connections(true);
             return;
         }
