@@ -1,18 +1,45 @@
-[gd_scene load_steps=5 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=6 format=3 uid="uid://dh0oj81pufivs"]
 
-[ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://root.gd" id="1_eb2wh"]
-[ext_resource type="Script" uid="uid://dnryqi700idk5" path="res://tagged_object.gd" id="2_j1pmf"]
+[ext_resource type="Script" uid="uid://dnryqi700idk5" path="res://scripts/tag_comparing_object.gd" id="2_j1pmf"]
+[ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://scripts/container_comparing_object_.gd" id="3_cpijt"]
+[ext_resource type="Script" uid="uid://cdaax774hyo1l" path="res://scripts/container_comparing_tag_object.gd" id="3_t6etu"]
 
 [sub_resource type="Tag" id="Tag_j1pmf"]
-tag_path = &"NewTag2/"
+tag_path = &"Deep/Parent/Child/"
 
 [sub_resource type="Tag" id="Tag_t6etu"]
-tag_path = &"Crazy/"
+tag_path = &"Deep/Parent/"
 
 [node name="Root" type="Node"]
-script = ExtResource("1_eb2wh")
 
-[node name="TaggedObject" type="Node" parent="."]
+[node name="Tag" type="Node" parent="."]
+
+[node name="TagMatchDemo" type="Node" parent="Tag"]
 script = ExtResource("2_j1pmf")
 tag_a = SubResource("Tag_j1pmf")
 tag_b = SubResource("Tag_t6etu")
+
+[node name="TagInheritanceDemo" type="Node" parent="Tag"]
+script = ExtResource("2_j1pmf")
+tag_a = SubResource("Tag_j1pmf")
+tag_b = SubResource("Tag_t6etu")
+
+[node name="TagContainer" type="Node" parent="."]
+
+[node name="ContainerHasDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_t6etu")
+
+[node name="ContainerExactDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+
+[node name="ContainerAllDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+
+[node name="ContainerAnyDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+
+[node name="ContainerNoneDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+
+[node name="ContainerCountDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")

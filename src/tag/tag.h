@@ -11,6 +11,7 @@ public:
     class TagTreeItem *get_tag();
 
     bool match(Tag *tag);
+    bool match_inheritance(Tag *tag);
 
     void set_tag_path(StringName path);
     StringName get_tag_path() { return tag_path; }
