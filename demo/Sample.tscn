@@ -238,3 +238,102 @@ container_b = SubResource("TagContainer_huric")
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_igahw")
 container_b = SubResource("TagContainer_5vrnx")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -364.0
+offset_top = -27.5
+offset_right = 364.0
+offset_bottom = 27.5
+grow_horizontal = 2
+grow_vertical = 2
+columns = 4
+
+[node name="TagMatchPass" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Tag Match Pass"
+
+[node name="TagMatchFail" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = " Tag Match Fail"
+
+[node name="TagInheritPass" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Tag Inherit Pass"
+
+[node name="TagInheritFail" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Tag Inherit Fail"
+
+[node name="ContainerHasMatch" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container Has Match"
+
+[node name="ContainerHasFail" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container Has Fail"
+
+[node name="ContainerAnyPass" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container Any Pass"
+
+[node name="ContainerAnyFail" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container Any Fail"
+
+[node name="ContainerExactPass" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container Exact Pass"
+
+[node name="ContainerExactFail" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container Exact Fail"
+
+[node name="ContainerAllPass" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "ContainerAllPass"
+
+[node name="ContainerAllFail" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "ContainerAllFail"
+
+[node name="ContainerNonePass" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container None Pass"
+
+[node name="ContainerNoneFail" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container None Fail"
+
+[node name="ContainerCount" type="Button" parent="Control/GridContainer"]
+layout_mode = 2
+text = "Container Count"
+
+[connection signal="button_down" from="Control/GridContainer/TagMatchPass" to="Tag/TagMatchDemo" method="compare_a_b"]
+[connection signal="button_down" from="Control/GridContainer/TagMatchFail" to="Tag/TagFailMatchDemo" method="compare_a_b"]
+[connection signal="button_down" from="Control/GridContainer/TagInheritPass" to="Tag/TagInheritanceMatchDemo" method="compare_a_b_inheret"]
+[connection signal="button_down" from="Control/GridContainer/TagInheritFail" to="Tag/TagInheritanceFailDemo" method="compare_a_b_inheret"]
+[connection signal="button_down" from="Control/GridContainer/ContainerHasMatch" to="TagContainer/ContainerHasMatchDemo" method="check_for_tag"]
+[connection signal="button_down" from="Control/GridContainer/ContainerHasFail" to="TagContainer/ContainerHasFailDemo" method="check_for_tag"]
+[connection signal="button_down" from="Control/GridContainer/ContainerAnyPass" to="TagContainer/ContainerAnyPassDemo" method="check_any"]
+[connection signal="button_down" from="Control/GridContainer/ContainerAnyFail" to="TagContainer/ContainerAnyFailDemo" method="check_any"]
+[connection signal="button_down" from="Control/GridContainer/ContainerExactPass" to="TagContainer/ContainerExactPassDemo" method="check_exact"]
+[connection signal="button_down" from="Control/GridContainer/ContainerExactFail" to="TagContainer/ContainerExactFailDemo" method="check_exact"]
+[connection signal="button_down" from="Control/GridContainer/ContainerAllPass" to="TagContainer/ContainerAllPassDemo" method="check_all"]
+[connection signal="button_down" from="Control/GridContainer/ContainerAllFail" to="TagContainer/ContainerAllFailDemo" method="check_all"]
+[connection signal="button_down" from="Control/GridContainer/ContainerNonePass" to="TagContainer/ContainerNonePassDemo" method="check_none"]
+[connection signal="button_down" from="Control/GridContainer/ContainerNoneFail" to="TagContainer/ContainerNoneFailDemo" method="check_none"]
+[connection signal="button_down" from="Control/GridContainer/ContainerCount" to="TagContainer/ContainerCountDemo" method="print_overlaps"]
