@@ -2,6 +2,9 @@
 A simple tagging system for Godot, modeled after Unreal Engine's gameplay tag system.
 The purpose of the system is to provide a nice way to easily handle string constants.
 
+## Installation
+Extract the GDTag folder into your project, the folder should include GDTag.gdextension and a folder with the name of your operating system.
+
 ## Usage
 ### Tags
 To use a tag, create an export variable with a type of Tag in gdscript:
