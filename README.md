@@ -1,5 +1,5 @@
 # GDTag
-A simple tagging system for Godot, modeled after Unreal Engine's gameplay tag system.
+A simple tagging system for Godot 4.1+, modeled after Unreal Engine's gameplay tag system.
 The purpose of the system is to provide a nice way to easily handle string constants.
 
 ## Installation
