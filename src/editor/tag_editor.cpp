@@ -129,20 +129,28 @@ void TagEditor::refresh_tags() {
 }
 
 void TagEditor::check_tag(TypedArray<StringName> path_arr) {
-    if (mode == TagEditorMode::READ) {
+    if (mode == TagEditorMode::READ || path_arr.size() == 0) {
         return;
     }
 
     TreeItem *item = get_item_from_path_arr(path_arr);
+    if (item == nullptr) {
+        return;
+    }
+
     item->set_checked(1, true);
 }
 
 void TagEditor::uncheck_tag(TypedArray<StringName> path_arr) {
-    if (mode == TagEditorMode::READ) {
+    if (mode == TagEditorMode::READ || path_arr.size() == 0) {
         return;
     }
 
     TreeItem *item = get_item_from_path_arr(path_arr);
+    if (item == nullptr) {
+        return;
+    }
+
     item->set_checked(1, false);
 }
 
@@ -257,6 +265,10 @@ void TagEditor::delete_selected_tag() {
     if (selected_item == nullptr) {
         return;
     }
+
+    if (mode != TagEditorMode::READ) {
+        selected_item->set_checked(1, false);
+    }
     
 	// UtilityFunctions::print("\nDeleting tag...");
     TagTreeItem *tag = database->get_tag(get_selected_tag_path_arr());
@@ -318,8 +330,7 @@ void TagEditor::update_tag_database() {
             return;
         }
         
-        if ((mode == TagEditorMode::SELECT || mode == TagEditorMode::SELECT_MULTI) 
-                && selected_item->is_selected(1)) {
+        if (mode != TagEditorMode::READ && selected_item->is_selected(1)) {
             toggle_select_tag();
             toggle_database_signal_connections(true);
             return;
@@ -412,8 +423,10 @@ TypedArray<StringName> TagEditor::get_tag_path_arr(TreeItem *item) {
 }
 
 TreeItem *TagEditor::get_item_from_path_arr(TypedArray<StringName> path_arr) {
-    // UtilityFunctions::print("Checking tag with path:");
-    // UtilityFunctions::print(path);
+    path_arr = path_arr.duplicate(); // Prevents passed in array from being modified
+
+    UtilityFunctions::print("Checking tag with path:");
+    UtilityFunctions::print(path_arr);
 
     if (root->get_child_count() == 0 || path_arr.size() == 0) {
         return nullptr;
@@ -424,22 +437,22 @@ TreeItem *TagEditor::get_item_from_path_arr(TypedArray<StringName> path_arr) {
 
     while (child != nullptr)
     {
-        // UtilityFunctions::print("\nNode: '" + node + "' Child: '" + child->get_text(0) + "'");
+        UtilityFunctions::print("\nNode: '" + node + "' Child: '" + child->get_text(0) + "'");
 
         if (child->get_text(0) == node) {
             if (path_arr.size() == 0) {
                 child->set_checked(1, true);
-                // UtilityFunctions::print("Found node to check!");
+                UtilityFunctions::print("Found node to check!");
                 return child;
             }
 
-            // UtilityFunctions::print("Found node... getting first child.");
+            UtilityFunctions::print("Found node... getting first child.");
             child = child->get_first_child();
             node = (StringName) path_arr.pop_front();
         }
         else {
             child = child->get_next();
-            // UtilityFunctions::print("Not this... getting next child");
+            UtilityFunctions::print("Not this... getting next child");
         }
     }
 

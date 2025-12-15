@@ -34,11 +34,11 @@ void TagContainerPropertyEditor::initialize(Object *p_owner, String p_property_n
         return;
     }
 
-    refresh_button_text();
+    refresh_tag_text();
 }
 
 void TagContainerPropertyEditor::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("refresh_button_text"), &TagContainerPropertyEditor::refresh_button_text);
+    ClassDB::bind_method(D_METHOD("refresh_tag_text"), &TagContainerPropertyEditor::refresh_tag_text);
 }
 
 void TagContainerPropertyEditor::toggle_tag_editor() {
@@ -89,8 +89,8 @@ void TagContainerPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr)
     undo_redo->add_do_method(tag_container.ptr(), "add_tag_path", tag_path);
     undo_redo->add_undo_method(tag_container.ptr(), "remove_tag_path", tag_path);
 
-    undo_redo->add_do_method(this, "refresh_button_text");
-    undo_redo->add_undo_method(this, "refresh_button_text");
+    undo_redo->add_do_method(this, "refresh_tag_text");
+    undo_redo->add_undo_method(this, "refresh_tag_text");
 
     undo_redo->add_do_method(editor, "check_tag", tag_path_arr);
     undo_redo->add_undo_method(editor, "uncheck_tag", tag_path_arr);
@@ -103,7 +103,7 @@ void TagContainerPropertyEditor::unselect_tag(TypedArray<StringName> tag_path_ar
     StringName tag_path = TagHelpers::merge_path(tag_path_arr);
     
     EditorUndoRedoManager *undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
-    undo_redo->create_action("Select tag");
+    undo_redo->create_action("Unselect tag");
     
     if (tag_container.is_null()) {       
         Ref<TagContainer> ref(memnew(TagContainer));
@@ -116,8 +116,8 @@ void TagContainerPropertyEditor::unselect_tag(TypedArray<StringName> tag_path_ar
     undo_redo->add_do_method(tag_container.ptr(), "remove_tag_path", tag_path);
     undo_redo->add_undo_method(tag_container.ptr(), "add_tag_path", tag_path);
 
-    undo_redo->add_do_method(this, "refresh_button_text");
-    undo_redo->add_undo_method(this, "refresh_button_text");
+    undo_redo->add_do_method(this, "refresh_tag_text");
+    undo_redo->add_undo_method(this, "refresh_tag_text");
 
     undo_redo->add_do_method(editor, "uncheck_tag", tag_path_arr);
     undo_redo->add_undo_method(editor, "check_tag", tag_path_arr);
@@ -125,5 +125,19 @@ void TagContainerPropertyEditor::unselect_tag(TypedArray<StringName> tag_path_ar
     undo_redo->commit_action();
 }
 
-void TagContainerPropertyEditor::refresh_button_text() {
+void TagContainerPropertyEditor::refresh_tag_text() {
+    if (tag_container == nullptr) {
+        return;
+    }
+    
+    int tag_count = tag_container->size();
+    
+    if (tag_count == 1) {
+        StringName path = (StringName) tag_container->get_tag_paths()[0];
+        select_button->set_text(path);
+        return;
+    }
+    
+    TypedArray<StringName> paths = tag_container->get_tag_paths();
+    select_button->set_text("(" + UtilityFunctions::str(tag_count) + ")" + " Tags selected");
 }

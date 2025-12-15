@@ -15,6 +15,8 @@ public:
 
     TypedArray<StringName> get_tag_paths() { return tag_paths.keys(); }
 
+    bool has(class Tag *tag);
+
     int size() { return tag_paths.size(); }
     
     void set_tag_paths_map(Dictionary paths) { tag_paths = paths; }

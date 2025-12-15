@@ -1,12 +1,6 @@
 #pragma once
 
 #include "editor/gdtag_property_editor.hpp"
-#include <godot_cpp/classes/h_box_container.hpp>
-#include <godot_cpp/classes/margin_container.hpp>
-#include <godot_cpp/classes/label.hpp>
-#include <godot_cpp/classes/button.hpp>
-#include <godot_cpp/classes/popup_menu.hpp>
-#include <godot_cpp/variant/string.hpp>
 
 using namespace godot;
 
@@ -32,7 +26,7 @@ protected:
 private:
     void get_tag_container();
 
-    void refresh_button_text();
+    void refresh_tag_text();
 
     Ref<class TagContainer> tag_container;
 };
