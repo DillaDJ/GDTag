@@ -27,7 +27,32 @@ A use case for this could be in an RPG: We have an **EnemyInfo** resource that h
 However, all undead types take damage from healing effects instead of restoring HP... We can use **enemy_type.match_inheritance('*Enemies/Undead/*')** to check this! This will match for our skeletons and also a new ghost type that we want to add in the future: '*Enemies/Undead/Ghost/*'
 
 ### TagContainers
-TODO: A TagContainer is useful if you want multiple tags on a property.
+**TagContainers** allow a property to have multiple tags:
+```gdscript
+@export var tag_container : TagContainer
+```
+You may use the tag editor to select tags for the **TagContainer**, similar to when editing a Tag.
+
+#### bool has(OtherTag: Tag)
+Returns true if the compared **Tag** *OtherTag* is in the container.
+
+#### bool any(OtherContainer: Tag)
+Returns true if the compared **TagContainer** *OtherContainer* has any tag that is in the container.
+
+#### bool exact(OtherContainer: Tag)
+Returns true if the compared **TagContainer** *OtherContainer* has the exact same tags as the container.
+
+#### bool all(OtherContainer: Tag)
+Returns true if the container has all the tags in the compared **TagContainer** *OtherContainer*.
+
+#### bool none(OtherContainer: Tag)
+Returns true if the container has none of the tags in the compared **TagContainer** *OtherContainer*.
+
+#### int overlap_count(OtherContainer: Tag)
+Returns the number of tags the container has in common with the compared **TagContainer** *OtherContainer*.
+
+#### int size()
+Returns the number of tags int the container.
 
 ## The Tag Editor
 To open the standalone tag editor: Project>Tools>Open Tag Editor

@@ -16,7 +16,12 @@ public:
     TypedArray<StringName> get_tag_paths() { return tag_paths.keys(); }
 
     bool has(class Tag *tag);
+    bool any(TagContainer *container);
+    bool exact(TagContainer *container);
+    bool all(TagContainer *container);
+    bool none(TagContainer *container);
 
+    int overlap_count(TagContainer *container);
     int size() { return tag_paths.size(); }
     
     void set_tag_paths_map(Dictionary paths) { tag_paths = paths; }

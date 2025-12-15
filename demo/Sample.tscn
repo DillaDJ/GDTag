@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=34 format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="Script" uid="uid://dnryqi700idk5" path="res://scripts/tag_comparing_object.gd" id="2_j1pmf"]
 [ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://scripts/container_comparing_object_.gd" id="3_cpijt"]
@@ -34,6 +34,130 @@ tag_paths = {
 &"Shallow/": true
 }
 
+[sub_resource type="Tag" id="Tag_q63f0"]
+tag_path = &"Shallow/"
+
+[sub_resource type="TagContainer" id="TagContainer_cpijt"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="Tag" id="Tag_3vedc"]
+tag_path = &"Deep/Parent/Children/"
+
+[sub_resource type="TagContainer" id="TagContainer_l0ncq"]
+tag_paths = {
+&"Deep/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_wffsx"]
+tag_paths = {
+&"Deep/": true,
+&"Deep/Parent/Children/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_51o3q"]
+tag_paths = {
+&"Deep/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_5vpmp"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Deep/Parent/Children/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_iuf4w"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_paaqm"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_reemd"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_llj5n"]
+tag_paths = {
+&"Deep/Parent/Children/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_m5l2a"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Deep/Parent/Children/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_6sieb"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Deep/Parent/Children/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_q63f0"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Deep/Parent/Children/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_3vedc"]
+tag_paths = {
+&"Deep/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_d2jd3"]
+tag_paths = {
+&"Deep/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_gsfgt"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Deep/Parent/Children/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_n8c11"]
+tag_paths = {
+&"Deep/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_huric"]
+tag_paths = {
+&"Deep/": true,
+&"Deep/Parent/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_igahw"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Deep/Parent/Children/": true,
+&"Shallow/": true
+}
+
+[sub_resource type="TagContainer" id="TagContainer_5vrnx"]
+tag_paths = {
+&"Deep/": true,
+&"Deep/Parent/Children/": true,
+&"Shallow/": true
+}
+
 [node name="Root" type="Node"]
 
 [node name="Tag" type="Node" parent="."]
@@ -60,21 +184,57 @@ tag_b = SubResource("Tag_6sieb")
 
 [node name="TagContainer" type="Node" parent="."]
 
-[node name="ContainerHasDemo" type="Node" parent="TagContainer"]
+[node name="ContainerHasMatchDemo" type="Node" parent="TagContainer"]
 script = ExtResource("3_t6etu")
 container = SubResource("TagContainer_t6etu")
+tag = SubResource("Tag_q63f0")
 
-[node name="ContainerExactDemo" type="Node" parent="TagContainer"]
-script = ExtResource("3_cpijt")
+[node name="ContainerHasFailDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_t6etu")
+container = SubResource("TagContainer_cpijt")
+tag = SubResource("Tag_3vedc")
 
-[node name="ContainerAllDemo" type="Node" parent="TagContainer"]
+[node name="ContainerAnyPassDemo" type="Node" parent="TagContainer"]
 script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_l0ncq")
+container_b = SubResource("TagContainer_wffsx")
 
-[node name="ContainerAnyDemo" type="Node" parent="TagContainer"]
+[node name="ContainerAnyFailDemo" type="Node" parent="TagContainer"]
 script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_51o3q")
+container_b = SubResource("TagContainer_5vpmp")
 
-[node name="ContainerNoneDemo" type="Node" parent="TagContainer"]
+[node name="ContainerExactPassDemo" type="Node" parent="TagContainer"]
 script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_iuf4w")
+container_b = SubResource("TagContainer_paaqm")
+
+[node name="ContainerExactFailDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_reemd")
+container_b = SubResource("TagContainer_llj5n")
+
+[node name="ContainerAllPassDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_m5l2a")
+container_b = SubResource("TagContainer_6sieb")
+
+[node name="ContainerAllFailDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_q63f0")
+container_b = SubResource("TagContainer_3vedc")
+
+[node name="ContainerNonePassDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_d2jd3")
+container_b = SubResource("TagContainer_gsfgt")
+
+[node name="ContainerNoneFailDemo" type="Node" parent="TagContainer"]
+script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_n8c11")
+container_b = SubResource("TagContainer_huric")
 
 [node name="ContainerCountDemo" type="Node" parent="TagContainer"]
 script = ExtResource("3_cpijt")
+container_a = SubResource("TagContainer_igahw")
+container_b = SubResource("TagContainer_5vrnx")
