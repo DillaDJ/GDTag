@@ -10,26 +10,29 @@
 
 using namespace godot;
 
-class TagPropertyEditor : public GDTagPropertyEditor {
-    GDCLASS(TagPropertyEditor, GDTagPropertyEditor);
+class TagContainerPropertyEditor : public GDTagPropertyEditor {
+    GDCLASS(TagContainerPropertyEditor, GDTagPropertyEditor);
 
 public:
-    TagPropertyEditor();
-    ~TagPropertyEditor() {}
+    TagContainerPropertyEditor();
+    ~TagContainerPropertyEditor() {}
     
     void _exit_tree() override;
 
     void initialize(Object *p_owner, String p_property_name) override;
 
 protected:
-    static void _bind_methods() { };
+    static void _bind_methods();
 
     void toggle_tag_editor() override;
 
     void select_tag(TypedArray<StringName> tag_path_arr) override;
-    
-private:
-    void get_tag();
+    void unselect_tag(TypedArray<StringName> tag_path_arr);
 
-    Ref<class Tag> tag;
+private:
+    void get_tag_container();
+
+    void refresh_button_text();
+
+    Ref<class TagContainer> tag_container;
 };

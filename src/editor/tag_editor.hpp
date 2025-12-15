@@ -30,7 +30,8 @@ public:
     void refresh_tags();
 
     void check_tag(TypedArray<StringName> path_arr);
-    void uncheck_tags();
+    void uncheck_tag(TypedArray<StringName> path_arr);
+    void uncheck_all_tags();
 
 protected:
     static void _bind_methods();
@@ -60,8 +61,10 @@ private:
     TypedArray<StringName> get_selected_tag_path_arr();
     TypedArray<StringName> get_edited_tag_path_arr();
     TypedArray<StringName> get_tag_path_arr(TreeItem *item);
-    
-    TagEditorMode mode;
+
+	TreeItem *get_item_from_path_arr(TypedArray<StringName> path_arr);
+
+	TagEditorMode mode;
     
     class TagDatabase *database;
 

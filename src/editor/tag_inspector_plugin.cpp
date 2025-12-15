@@ -1,5 +1,7 @@
 #include "tag_inspector_plugin.h"
 #include "tag_property_editor.hpp"
+#include "tag_container_property_editor.hpp"
+#include "tag/tag_container.h"
 #include "tag/tag.h"
 
 bool TagInspectorPlugin::_can_handle(Object *p_object) const {
@@ -14,6 +16,13 @@ bool TagInspectorPlugin::_parse_property(Object *p_object, Variant::Type p_type,
         TagPropertyEditor* tag_editor = memnew(TagPropertyEditor);
         tag_editor->initialize(p_object, p_name);
         add_custom_control(tag_editor);
+        return true;
+    }
+    
+    if (p_hint_string == TagContainer::get_class_static()) {        
+        TagContainerPropertyEditor* tag_container_editor = memnew(TagContainerPropertyEditor);
+        tag_container_editor->initialize(p_object, p_name);
+        add_custom_control(tag_container_editor);
         return true;
     }
 

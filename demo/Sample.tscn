@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene load_steps=13 format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="Script" uid="uid://dnryqi700idk5" path="res://scripts/tag_comparing_object.gd" id="2_j1pmf"]
 [ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://scripts/container_comparing_object_.gd" id="3_cpijt"]
@@ -28,6 +28,12 @@ tag_path = &"Deep/Parent/"
 [sub_resource type="Tag" id="Tag_6sieb"]
 tag_path = &"Deep/Parent/Children/"
 
+[sub_resource type="TagContainer" id="TagContainer_t6etu"]
+tag_paths = {
+&"Deep/Parent/": true,
+&"Shallow/": true
+}
+
 [node name="Root" type="Node"]
 
 [node name="Tag" type="Node" parent="."]
@@ -56,6 +62,7 @@ tag_b = SubResource("Tag_6sieb")
 
 [node name="ContainerHasDemo" type="Node" parent="TagContainer"]
 script = ExtResource("3_t6etu")
+container = SubResource("TagContainer_t6etu")
 
 [node name="ContainerExactDemo" type="Node" parent="TagContainer"]
 script = ExtResource("3_cpijt")

@@ -11,59 +11,15 @@
 #include "tag/tag.h"
 
 TagPropertyEditor::TagPropertyEditor() {
-    container = memnew(VBoxContainer);
-	container->add_theme_constant_override("separation", 0);
-    add_child(container);
-    
-    h_layout = memnew(HBoxContainer);
-    container->add_child(h_layout);
-    
-    property_label = memnew(Label);
-    property_label->set_h_size_flags(SIZE_EXPAND | SIZE_FILL);
-    property_label->set_stretch_ratio(0.5f);
-    h_layout->add_child(property_label);
-    
-    select_button = memnew(Button);
-	select_button->connect("pressed", callable_mp(this, &TagPropertyEditor::toggle_tag_editor));
-    select_button->set_theme_type_variation("InspectorActionButton");
-    select_button->set_h_size_flags(SIZE_EXPAND | SIZE_FILL);
-    select_button->set_toggle_mode(true);
-
-    h_layout->add_child(select_button);
-
-    editor = memnew(TagEditor);
-    editor->connect("tag_selected", callable_mp(this, &TagPropertyEditor::select_tag));
-    editor->set_custom_minimum_size(Vector2(0, 400));
-    editor->set_visible(false);
     editor->set_mode(TagEditorMode::SELECT);
-
-    container->add_child(editor);
 }
 
 void TagPropertyEditor::_exit_tree() {
-    container->remove_child(editor);
-    memdelete(editor);
-    
-    h_layout->remove_child(select_button);
-    memdelete(select_button);
-
-    h_layout->remove_child(property_label);
-    memdelete(property_label);
-        
-    container->remove_child(h_layout);
-    memdelete(h_layout);
-
-    remove_child(container);
-    memdelete(container);
-
     tag.unref();
 }
 
 void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
-    owner = p_owner;
-    property_name = p_property_name;
-
-    property_label->set_text(property_name.capitalize());
+    GDTagPropertyEditor::initialize(p_owner, p_property_name);
     get_tag();
 
     if (tag.is_null()) {
@@ -81,13 +37,9 @@ void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
 }
 
 void TagPropertyEditor::toggle_tag_editor() {
-    bool visible = !editor->is_visible();
-    editor->set_visible(visible);
-
-    if (!visible) { return; }
-    editor->refresh_tags();
+    GDTagPropertyEditor::toggle_tag_editor();
     
-    if (tag.is_null()) {
+    if (!editor->is_visible() || tag.is_null()) {
         return;
     }
 
@@ -133,8 +85,8 @@ void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr) {
     undo_redo->add_do_method(select_button, "set_text", tag_path);
     undo_redo->add_undo_method(select_button, "set_text", old_tag_path == SNAME("") ? "Select Tag" : old_tag_path);
 
-    undo_redo->add_do_method(editor, "uncheck_tags");
-    undo_redo->add_undo_method(editor, "uncheck_tags");
+    undo_redo->add_do_method(editor, "uncheck_all_tags");
+    undo_redo->add_undo_method(editor, "uncheck_all_tags");
 
     undo_redo->add_do_method(editor, "check_tag", tag_path_arr);
     undo_redo->add_undo_method(editor, "check_tag", old_path_arr);

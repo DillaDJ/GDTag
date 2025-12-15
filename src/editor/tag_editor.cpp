@@ -106,7 +106,8 @@ void TagEditor::_bind_methods() {
     ClassDB::bind_method(D_METHOD("prompt_selected_tag_name"), &TagEditor::prompt_selected_tag_name);
     ClassDB::bind_method(D_METHOD("prompt_selected_tag_rename"), &TagEditor::prompt_selected_tag_rename);
     ClassDB::bind_method(D_METHOD("check_tag"), &TagEditor::check_tag);
-    ClassDB::bind_method(D_METHOD("uncheck_tags"), &TagEditor::uncheck_tags);
+    ClassDB::bind_method(D_METHOD("uncheck_tag"), &TagEditor::uncheck_tag);
+    ClassDB::bind_method(D_METHOD("uncheck_all_tags"), &TagEditor::uncheck_all_tags);
 
     ADD_SIGNAL(MethodInfo("tag_selected", PropertyInfo(Variant::ARRAY, "tag_path")));
     ADD_SIGNAL(MethodInfo("tag_unselected", PropertyInfo(Variant::ARRAY, "tag_path")));
@@ -128,39 +129,24 @@ void TagEditor::refresh_tags() {
 }
 
 void TagEditor::check_tag(TypedArray<StringName> path_arr) {
-    // UtilityFunctions::print("Checking tag with path:");
-    // UtilityFunctions::print(path);
-
-    if (root->get_child_count() == 0 || path_arr.size() == 0) {
+    if (mode == TagEditorMode::READ) {
         return;
     }
 
-    StringName node = (StringName) path_arr.pop_front();
-    TreeItem *child = root->get_first_child();
-
-    while (child != nullptr)
-    {
-        // UtilityFunctions::print("\nNode: '" + node + "' Child: '" + child->get_text(0) + "'");
-
-        if (child->get_text(0) == node) {
-            if (path_arr.size() == 0) {
-                child->set_checked(1, true);
-                // UtilityFunctions::print("Found node to check!");
-                return;
-            }
-
-            // UtilityFunctions::print("Found node... getting first child.");
-            child = child->get_first_child();
-            node = (StringName) path_arr.pop_front();
-        }
-        else {
-            child = child->get_next();
-            // UtilityFunctions::print("Not this... getting next child");
-        }
-    }
+    TreeItem *item = get_item_from_path_arr(path_arr);
+    item->set_checked(1, true);
 }
 
-void TagEditor::uncheck_tags() {
+void TagEditor::uncheck_tag(TypedArray<StringName> path_arr) {
+    if (mode == TagEditorMode::READ) {
+        return;
+    }
+
+    TreeItem *item = get_item_from_path_arr(path_arr);
+    item->set_checked(1, false);
+}
+
+void TagEditor::uncheck_all_tags() {
     uncheck_recursive(root);
 }
 
@@ -226,7 +212,7 @@ void TagEditor::toggle_select_tag() {
         }
         
         emit_signal("tag_unselected", path_arr);
-        UtilityFunctions::print("Unselect");
+        // UtilityFunctions::print("Unselect");
         return;
     }
     
@@ -317,12 +303,6 @@ void TagEditor::update_tag_database() {
     TagTreeItem *current = database->get_tag(tag_path);
     
     if (new_name == SNAME("")) {
-        if (mode == TagEditorMode::SELECT && selected_item->is_selected(1)) {
-            toggle_select_tag();
-            toggle_database_signal_connections(true);
-            return;
-        }
-
         UtilityFunctions::push_warning("Empty tags are forbidden!");
 
         selected_item->set_text(0, old_tag_name);
@@ -338,7 +318,8 @@ void TagEditor::update_tag_database() {
             return;
         }
         
-        if (mode == TagEditorMode::SELECT && selected_item->is_selected(1)) {
+        if ((mode == TagEditorMode::SELECT || mode == TagEditorMode::SELECT_MULTI) 
+                && selected_item->is_selected(1)) {
             toggle_select_tag();
             toggle_database_signal_connections(true);
             return;
@@ -428,4 +409,39 @@ TypedArray<StringName> TagEditor::get_tag_path_arr(TreeItem *item) {
 
     path.reverse();
 	return path;
+}
+
+TreeItem *TagEditor::get_item_from_path_arr(TypedArray<StringName> path_arr) {
+    // UtilityFunctions::print("Checking tag with path:");
+    // UtilityFunctions::print(path);
+
+    if (root->get_child_count() == 0 || path_arr.size() == 0) {
+        return nullptr;
+    }
+
+    StringName node = (StringName) path_arr.pop_front();
+    TreeItem *child = root->get_first_child();
+
+    while (child != nullptr)
+    {
+        // UtilityFunctions::print("\nNode: '" + node + "' Child: '" + child->get_text(0) + "'");
+
+        if (child->get_text(0) == node) {
+            if (path_arr.size() == 0) {
+                child->set_checked(1, true);
+                // UtilityFunctions::print("Found node to check!");
+                return child;
+            }
+
+            // UtilityFunctions::print("Found node... getting first child.");
+            child = child->get_first_child();
+            node = (StringName) path_arr.pop_front();
+        }
+        else {
+            child = child->get_next();
+            // UtilityFunctions::print("Not this... getting next child");
+        }
+    }
+
+    return nullptr;
 }
