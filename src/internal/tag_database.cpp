@@ -156,7 +156,7 @@ void TagDatabase::remove_tag_recursive(TagTreeItem *tag) {
 }
 
 void TagDatabase::read_from_file() {
-	Ref<FileAccess> file = FileAccess::open("res://bin/tag_database.json", FileAccess::READ);
+	Ref<FileAccess> file = FileAccess::open("res://addons/GDTag/tag_database.json", FileAccess::READ);
 	if (file == nullptr) {
 		// UtilityFunctions::print("Could not open tag_database.json");
 		return;
@@ -200,7 +200,7 @@ void TagDatabase::load_tags(Array loaded_tags) {
 }
 
 void TagDatabase::write_to_file() {
-	Ref<FileAccess> file = FileAccess::open("res://bin/tag_database.json", FileAccess::WRITE);
+	Ref<FileAccess> file = FileAccess::open("res://addons/GDTag/tag_database.json", FileAccess::WRITE);
 	
 	String json = "";
 
