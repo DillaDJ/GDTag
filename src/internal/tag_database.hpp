@@ -38,6 +38,8 @@ private:
 
     void write_to_file();
 
+    StringName get_file_path();
+
     static TagDatabase *singleton;
 
     Dictionary nodes; // StringName, TagTreeItem

@@ -4,6 +4,8 @@
 #include <godot_cpp/classes/packed_scene.hpp>
 #include <godot_cpp/classes/Node.hpp>
 #include <godot_cpp/classes/Control.hpp>
+#include <godot_cpp/classes/editor_interface.hpp>
+#include <godot_cpp/classes/editor_settings.hpp>
 
 #include <godot_cpp/variant/utility_functions.hpp>
 #include "internal/tag_database.hpp"
@@ -14,6 +16,20 @@ using namespace godot;
 
 TagPlugin::TagPlugin() {
     TagDatabase *database = TagDatabase::get_singleton();
+
+    Ref<EditorSettings> settings = EditorInterface::get_singleton()->get_editor_settings();
+    if (settings->has_setting("GD_tag/tag_database_location")) {
+        return;
+    }
+    
+    settings->set_setting("GD_tag/tag_database_location", "res://");
+
+    Dictionary property_info;
+    property_info["name"] = "GD_tag/tag_database_location";
+    property_info["type"] = Variant::Type::STRING;
+    property_info["hint"] = PROPERTY_HINT_DIR;
+
+    settings->add_property_info(property_info);
 }
 
 TagPlugin::~TagPlugin() {

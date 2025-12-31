@@ -1,6 +1,8 @@
 #include "tag_database.hpp"
 
 #include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/classes/editor_interface.hpp>
+#include <godot_cpp/classes/editor_settings.hpp>
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/classes/json.hpp>
 #include "internal/helpers.hpp"
@@ -156,7 +158,7 @@ void TagDatabase::remove_tag_recursive(TagTreeItem *tag) {
 }
 
 void TagDatabase::read_from_file() {
-	Ref<FileAccess> file = FileAccess::open("res://addons/GDTag/tag_database.json", FileAccess::READ);
+	Ref<FileAccess> file = FileAccess::open(get_file_path(), FileAccess::READ);
 	if (file == nullptr) {
 		// UtilityFunctions::print("Could not open tag_database.json");
 		return;
@@ -200,7 +202,11 @@ void TagDatabase::load_tags(Array loaded_tags) {
 }
 
 void TagDatabase::write_to_file() {
-	Ref<FileAccess> file = FileAccess::open("res://addons/GDTag/tag_database.json", FileAccess::WRITE);
+	Ref<FileAccess> file = FileAccess::open(get_file_path(), FileAccess::WRITE);
+	if (file == nullptr) {
+		UtilityFunctions::push_error("Could not open tag_database.json for writing");
+		return;
+	}
 	
 	String json = "";
 
@@ -222,4 +228,11 @@ void TagDatabase::write_to_file() {
 	json = JSON::stringify(tags, "\t");
 	file->store_string(json);
 	file->close();
+}
+
+StringName TagDatabase::get_file_path() {
+	Ref<EditorSettings> settings = EditorInterface::get_singleton()->get_editor_settings();
+	Variant path = settings->get_setting("GD_tag/tag_database_location");
+	// UtilityFunctions::print(path);
+	return (StringName) path + SNAME("/tag_database.json");
 }

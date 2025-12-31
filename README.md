@@ -3,7 +3,7 @@ A simple tagging system for Godot 4.1+, modeled after Unreal Engine's gameplay t
 The purpose of the system is to provide a nice way to easily handle string constants.
 
 ## Installation
-Extract the GDTag folder into the addon folder in your project root, if it's not there, create it.
+Extract the GDTag folder wherever you'd like in your project. Optionally, configure your tag_database.json file's location in the editor settings (make sure advanced settings is enabled or search "GD Tag").
 
 ## Usage
 ### Tags
