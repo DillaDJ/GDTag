@@ -3,6 +3,7 @@
 #include <godot_cpp/classes/editor_interface.hpp>
 #include <godot_cpp/classes/editor_undo_redo_manager.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/classes/line_edit.hpp>
 #include <godot_cpp/classes/style_box.hpp>
 
 #include "internal/helpers.hpp"
@@ -12,6 +13,7 @@
 TagEditor::TagEditor() {
     set_name("Tag Editor");
     mode = TagEditorMode::READ;
+    unnamed = false;
 
     database = TagDatabase::get_singleton();
     toggle_database_signal_connections(true);
@@ -108,6 +110,7 @@ void TagEditor::_bind_methods() {
     ClassDB::bind_method(D_METHOD("check_tag"), &TagEditor::check_tag);
     ClassDB::bind_method(D_METHOD("uncheck_tag"), &TagEditor::uncheck_tag);
     ClassDB::bind_method(D_METHOD("uncheck_all_tags"), &TagEditor::uncheck_all_tags);
+    ClassDB::bind_method(D_METHOD("remove_unnamed"), &TagEditor::remove_unnamed);
 
     ADD_SIGNAL(MethodInfo("tag_selected", PropertyInfo(Variant::ARRAY, "tag_path")));
     ADD_SIGNAL(MethodInfo("tag_unselected", PropertyInfo(Variant::ARRAY, "tag_path")));
@@ -272,6 +275,11 @@ void TagEditor::delete_selected_tag() {
     
 	// UtilityFunctions::print("\nDeleting tag...");
     TagTreeItem *tag = database->get_tag(get_selected_tag_path_arr());
+    if (tag == nullptr) {
+        memdelete(selected_item);
+        return;
+    }
+
     toggle_database_signal_connections(false);
     
     database->remove_tag(tag);
@@ -290,6 +298,8 @@ void TagEditor::prompt_selected_tag_name() {
     
     old_tag_name = SNAME("");
     tag_tree->edit_selected(true);
+    get_line_edit(tag_tree);
+    unnamed = true;
 }
 
 void TagEditor::prompt_selected_tag_rename() {
@@ -305,11 +315,12 @@ void TagEditor::prompt_selected_tag_rename() {
 
 void TagEditor::update_tag_database() {
     toggle_database_signal_connections(false);
+    unnamed = false;
 
     TreeItem *selected_item = tag_tree->get_edited();
     StringName new_name = selected_item->get_text(0);
 
-	// UtilityFunctions::print("\nUpdating tags...");
+	UtilityFunctions::print("\nUpdating tags...");
 
     TypedArray<StringName> tag_path = get_edited_tag_path_arr();
     TagTreeItem *current = database->get_tag(tag_path);
@@ -369,12 +380,12 @@ void TagEditor::add_new_tag(TypedArray<StringName> selected_tag_path_arr, String
 
     selected_tag_path_arr.pop_back();
     
-    // UtilityFunctions::print("Getting parent...");
+    UtilityFunctions::print("Getting parent...");
     TagTreeItem *parent = database->get_tag(selected_tag_path_arr);
     
-    // UtilityFunctions::print("Adding tag with parent...");
+    UtilityFunctions::print("Adding tag with parent...");
     database->add_tag(tag_name, parent);
-    database->save();
+    database->save();   
 }
 
 void TagEditor::rename_selected_tag(TypedArray<StringName> selected_tag_path_arr, StringName new_name) {
@@ -394,6 +405,51 @@ void TagEditor::rename_selected_tag(TypedArray<StringName> selected_tag_path_arr
 
 void TagEditor::empty_clicked(Vector2 position, MouseButton button) {
     tag_tree->deselect_all();
+}
+
+bool TagEditor::get_line_edit(Node *parent) {
+    TypedArray<Node> children = parent->get_children(true);
+
+    for (size_t i = 0; i < children.size(); i++)
+    {
+        LineEdit *line = cast_to<LineEdit>(children[i]);
+        Node *node = cast_to<Node>(children[i]);
+        UtilityFunctions::print(node->get_name());
+
+        if (line == nullptr) {
+            if (get_line_edit(node)) {
+                return true;
+            }
+
+            continue;
+        }
+
+        // UtilityFunctions::print("Found line");
+        line->connect("editing_toggled", callable_mp(this, &TagEditor::remove_from_escape).bind(line));
+        return true;
+    }
+
+    // UtilityFunctions::print("No line...");
+    return false;
+}
+
+void TagEditor::remove_from_escape(bool on, LineEdit *line) {
+    UtilityFunctions::print(on);
+    if (on) {
+        return;
+    }
+
+    line->disconnect("editing_toggled", callable_mp(this, &TagEditor::remove_from_escape));
+    call_deferred("remove_unnamed");
+}
+
+void TagEditor::remove_unnamed() {
+    if (!unnamed) {
+        return;
+    }
+    
+    TreeItem *selected_item = tag_tree->get_selected();
+    memdelete(selected_item);
 }
 
 TypedArray<StringName> TagEditor::get_selected_tag_path_arr() {    

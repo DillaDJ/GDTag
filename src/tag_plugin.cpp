@@ -18,11 +18,9 @@ TagPlugin::TagPlugin() {
     TagDatabase *database = TagDatabase::get_singleton();
 
     Ref<EditorSettings> settings = EditorInterface::get_singleton()->get_editor_settings();
-    if (settings->has_setting("GD_tag/tag_database_location")) {
-        return;
+    if (!settings->has_setting("GD_tag/tag_database_location")) {
+        settings->set_setting("GD_tag/tag_database_location", "res://");
     }
-    
-    settings->set_setting("GD_tag/tag_database_location", "res://");
 
     Dictionary property_info;
     property_info["name"] = "GD_tag/tag_database_location";

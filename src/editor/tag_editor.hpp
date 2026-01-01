@@ -8,6 +8,7 @@
 #include <godot_cpp/classes/button.hpp>
 #include <godot_cpp/classes/confirmation_dialog.hpp>
 #include <godot_cpp/classes/tree.hpp>
+#include <godot_cpp/classes/input_event_key.hpp>
 
 using namespace godot;
 
@@ -58,6 +59,12 @@ private:
 
 	void empty_clicked(Vector2 position, MouseButton button);
 
+    bool get_line_edit(Node *parent);
+
+    void remove_from_escape(bool on, LineEdit *line);
+
+    void remove_unnamed();
+
     TypedArray<StringName> get_selected_tag_path_arr();
     TypedArray<StringName> get_edited_tag_path_arr();
     TypedArray<StringName> get_tag_path_arr(TreeItem *item);
@@ -85,4 +92,6 @@ private:
     ConfirmationDialog *delete_confirm;
 
     StringName old_tag_name;
+
+    bool unnamed;
 };
