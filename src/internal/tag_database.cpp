@@ -1,8 +1,7 @@
 #include "tag_database.hpp"
 
 #include <godot_cpp/variant/utility_functions.hpp>
-#include <godot_cpp/classes/editor_interface.hpp>
-#include <godot_cpp/classes/editor_settings.hpp>
+#include <godot_cpp/classes/project_settings.hpp>
 #include <godot_cpp/classes/file_access.hpp>
 #include <godot_cpp/classes/json.hpp>
 #include "internal/helpers.hpp"
@@ -231,7 +230,7 @@ void TagDatabase::write_to_file() {
 }
 
 StringName TagDatabase::get_file_path() {
-	Ref<EditorSettings> settings = EditorInterface::get_singleton()->get_editor_settings();
+	ProjectSettings *settings = ProjectSettings::get_singleton();
 	Variant path = settings->get_setting("GD_tag/tag_database_location");
 	// UtilityFunctions::print(path);
 	return (StringName) path + SNAME("/tag_database.json");

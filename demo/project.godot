@@ -8,6 +8,10 @@
 
 config_version=5
 
+[GD_tag]
+
+tag_database_location="res://"
+
 [application]
 
 config/name="godot cpp template"
