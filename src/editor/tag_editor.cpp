@@ -320,7 +320,7 @@ void TagEditor::update_tag_database() {
     TreeItem *selected_item = tag_tree->get_edited();
     StringName new_name = selected_item->get_text(0);
 
-	UtilityFunctions::print("\nUpdating tags...");
+	// UtilityFunctions::print("\nUpdating tags...");
 
     TypedArray<StringName> tag_path = get_edited_tag_path_arr();
     TagTreeItem *current = database->get_tag(tag_path);
@@ -380,10 +380,10 @@ void TagEditor::add_new_tag(TypedArray<StringName> selected_tag_path_arr, String
 
     selected_tag_path_arr.pop_back();
     
-    UtilityFunctions::print("Getting parent...");
+    // UtilityFunctions::print("Getting parent...");
     TagTreeItem *parent = database->get_tag(selected_tag_path_arr);
     
-    UtilityFunctions::print("Adding tag with parent...");
+    // UtilityFunctions::print("Adding tag with parent...");
     database->add_tag(tag_name, parent);
     database->save();   
 }
@@ -414,7 +414,7 @@ bool TagEditor::get_line_edit(Node *parent) {
     {
         LineEdit *line = cast_to<LineEdit>(children[i]);
         Node *node = cast_to<Node>(children[i]);
-        UtilityFunctions::print(node->get_name());
+        // UtilityFunctions::print(node->get_name());
 
         if (line == nullptr) {
             if (get_line_edit(node)) {
@@ -434,7 +434,7 @@ bool TagEditor::get_line_edit(Node *parent) {
 }
 
 void TagEditor::remove_from_escape(bool on, LineEdit *line) {
-    UtilityFunctions::print(on);
+    // UtilityFunctions::print(on);
     if (on) {
         return;
     }

@@ -55,7 +55,7 @@ void Tag::set_tag_path(StringName path) {
     TagTreeItem *tag = database->get_tag(path_arr);
 	
 	if (tag == nullptr) {
-    	// UtilityFunctions::print("No tag found with path: " + UtilityFunctions::str(path_arr));
+    	UtilityFunctions::push_error("No tag found with path: " + UtilityFunctions::str(path_arr));
 		return;
 	}
 	
