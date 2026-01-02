@@ -33,11 +33,11 @@ bool TagContainer::has(Tag *tag) {
 }
 
 bool TagContainer::any(TagContainer *container) {
-    TypedArray<int> ids = container->get_tag_ids();
+    TypedArray<int> other_ids = container->get_tag_ids();
 
-    for (size_t i = 0; i < ids.size(); i++)
+    for (size_t i = 0; i < other_ids.size(); i++)
     {
-        int id = (int) ids[i];
+        int id = (int) other_ids[i];
         if (tag_ids.has(id)) {
             return true;
         }
@@ -51,11 +51,11 @@ bool TagContainer::exact(TagContainer *container) {
         return false;
     }
 
-    TypedArray<StringName> ids = container->get_tag_ids();
-    for (size_t i = 0; i < ids.size(); i++)
+    TypedArray<int> other_ids = container->get_tag_ids();
+    for (size_t i = 0; i < other_ids.size(); i++)
     {
-        int id = (int) ids[i];
-        if (!ids.has(id)) {
+        int id = (int) other_ids[i];
+        if (!tag_ids.has(id)) {
             return false;
         }
     }
@@ -74,11 +74,11 @@ bool TagContainer::none(TagContainer *container) {
 int TagContainer::overlap_count(TagContainer *container) {
     int overlaps = 0;
 
-    TypedArray<StringName> ids = container->get_tag_ids();
-    for (size_t i = 0; i < ids.size(); i++)
+    TypedArray<int> other_ids = container->get_tag_ids();
+    for (size_t i = 0; i < other_ids.size(); i++)
     {
-        int id = (int) ids[i];
-        if (ids.has(id)) {
+        int id = (int) other_ids[i];
+        if (tag_ids.has(id)) {
             overlaps++;
         }
     }
