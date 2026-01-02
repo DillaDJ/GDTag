@@ -8,7 +8,7 @@ class Tag : public Resource {
     GDCLASS(Tag, Resource);
     
 public:    
-    class TagTreeItem *get_tag();
+    class InternalTag *get_tag();
 
     bool match(Tag *tag);
     bool match_inheritance(Tag *tag);

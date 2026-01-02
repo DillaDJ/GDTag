@@ -1,12 +1,12 @@
 #include "tag.h"
 #include "internal/helpers.hpp"
 #include "internal/tag_database.hpp"
-#include "internal/tag_tree_item.hpp"
+#include "internal/internal_tag.hpp"
 
-TagTreeItem *Tag::get_tag() {
+InternalTag *Tag::get_tag() {
 	TagDatabase *database = TagDatabase::get_singleton();
     TypedArray<StringName> path_arr = TagHelpers::split_path(tag_path);   
-    TagTreeItem *tag = database->get_tag(path_arr);
+    InternalTag *tag = database->get_tag(path_arr);
     return tag;
 }
 
@@ -52,7 +52,7 @@ void Tag::set_tag_path(StringName path) {
 	TagDatabase *database = TagDatabase::get_singleton();
 	
     TypedArray<StringName> path_arr = TagHelpers::split_path(path);
-    TagTreeItem *tag = database->get_tag(path_arr);
+    InternalTag *tag = database->get_tag(path_arr);
 	
 	if (tag == nullptr) {
     	UtilityFunctions::push_error("No tag found with path: " + UtilityFunctions::str(path_arr));

@@ -8,7 +8,7 @@
 
 #include "internal/helpers.hpp"
 #include "internal/tag_database.hpp"
-#include "internal/tag_tree_item.hpp"
+#include "internal/internal_tag.hpp"
 
 TagEditor::TagEditor() {
     set_name("Tag Editor");
@@ -161,15 +161,16 @@ void TagEditor::uncheck_all_tags() {
     uncheck_recursive(root);
 }
 
-void TagEditor::populate_tags_recursive(TreeItem *parent_item, TagTreeItem *parent_tag) {
+void TagEditor::populate_tags_recursive(TreeItem *parent_item, InternalTag *parent_tag) {
     Array children = parent_tag == nullptr ? database->get_tags() : parent_tag->get_children();
 
     for (size_t i = 0; i < children.size(); i++)
     {
-        TagTreeItem *tag = cast_to<TagTreeItem>(children[i]);
+        InternalTag *tag = cast_to<InternalTag>(children[i]);
+        // UtilityFunctions::print(tag->get_tag_name());
 
         TreeItem *item = create_tree_item(parent_item == nullptr ? root : parent_item);
-        item->set_text(0, tag->get_name());
+        item->set_text(0, tag->get_tag_name());
         
         populate_tags_recursive(item, tag);
     }
@@ -274,7 +275,7 @@ void TagEditor::delete_selected_tag() {
     }
     
 	// UtilityFunctions::print("\nDeleting tag...");
-    TagTreeItem *tag = database->get_tag(get_selected_tag_path_arr());
+    InternalTag *tag = database->get_tag(get_selected_tag_path_arr());
     if (tag == nullptr) {
         memdelete(selected_item);
         return;
@@ -323,7 +324,7 @@ void TagEditor::update_tag_database() {
 	// UtilityFunctions::print("\nUpdating tags...");
 
     TypedArray<StringName> tag_path = get_edited_tag_path_arr();
-    TagTreeItem *current = database->get_tag(tag_path);
+    InternalTag *current = database->get_tag(tag_path);
     
     if (new_name == SNAME("")) {
         UtilityFunctions::push_warning("Empty tags are forbidden!");
@@ -373,7 +374,7 @@ void TagEditor::update_tag_database() {
 
 void TagEditor::add_new_tag(TypedArray<StringName> selected_tag_path_arr, StringName tag_name) {
     if (selected_tag_path_arr.size() <= 1) {
-        database->add_tag(tag_name);
+        database->add_tag(tag_name, nullptr, true);
         database->save();
         return;
     }
@@ -381,10 +382,10 @@ void TagEditor::add_new_tag(TypedArray<StringName> selected_tag_path_arr, String
     selected_tag_path_arr.pop_back();
     
     // UtilityFunctions::print("Getting parent...");
-    TagTreeItem *parent = database->get_tag(selected_tag_path_arr);
+    InternalTag *parent = database->get_tag(selected_tag_path_arr);
     
     // UtilityFunctions::print("Adding tag with parent...");
-    database->add_tag(tag_name, parent);
+    database->add_tag(tag_name, parent, true);
     database->save();   
 }
 
@@ -393,7 +394,7 @@ void TagEditor::rename_selected_tag(TypedArray<StringName> selected_tag_path_arr
 
     selected_tag_path_arr.pop_back();
     selected_tag_path_arr.append(old_tag_name);
-    TagTreeItem *old = database->get_tag(selected_tag_path_arr);
+    InternalTag *old = database->get_tag(selected_tag_path_arr);
 
     if (old != nullptr) {
         database->rename_tag(old, new_name);

@@ -1,24 +1,29 @@
-#include "tag_tree_item.hpp"
+#include "internal_tag.hpp"
 #include "internal/helpers.hpp"
 #include <godot_cpp/variant/utility_functions.hpp>
 
-TagTreeItem::TagTreeItem() {
+#include "internal/tag_database.hpp"
+
+InternalTag::InternalTag() {
     children = Dictionary();
+	id = 0;
 }
 
-void TagTreeItem::add_child(StringName name) {
+InternalTag *InternalTag::add_child(StringName name) {
     if (children.has(name)) {
-        return;
+        return nullptr;
     }
     
-	TagTreeItem* tag_item = memnew(TagTreeItem);
+	InternalTag* tag_item = memnew(InternalTag);
     tag_item->set_parent(this);
-	tag_item->set_name(name);
+	tag_item->set_tag_name(name);
     children[name] = tag_item;
+
+	return tag_item;
 }
 
-void TagTreeItem::add_child(TagTreeItem *tag) {
-    StringName name = tag->get_name();
+void InternalTag::add_child(InternalTag *tag) {
+    StringName name = tag->get_tag_name();
 
     if (children.has(name)) {
         return;
@@ -28,24 +33,24 @@ void TagTreeItem::add_child(TagTreeItem *tag) {
     tag->set_parent(this);
 }
 
-TagTreeItem *TagTreeItem::get_child(StringName name) {
-	return children.has(name) ? cast_to<TagTreeItem>(children[name]) : nullptr;
+InternalTag *InternalTag::get_child(StringName name) {
+	return children.has(name) ? cast_to<InternalTag>(children[name]) : nullptr;
 }
 
-void TagTreeItem::remove_child(StringName name) {
+void InternalTag::remove_child(StringName name) {
     if (!children.has(name)) return;
 	
-    TagTreeItem *tag = cast_to<TagTreeItem>(children[name]);
+    InternalTag *tag = cast_to<InternalTag>(children[name]);
     tag->set_parent(nullptr);
     children.erase(name);
 }
 
-TypedArray<StringName> TagTreeItem::get_path_arr() {
+TypedArray<StringName> InternalTag::get_path_arr() {
     TypedArray<StringName> path_arr = TypedArray<StringName>();
-	TagTreeItem *current = this;
+	InternalTag *current = this;
         
     while (current != nullptr) {
-        path_arr.append(current->get_name());
+        path_arr.append(current->get_tag_name());
         current = current->get_parent();
     }
 
@@ -53,7 +58,7 @@ TypedArray<StringName> TagTreeItem::get_path_arr() {
 	return path_arr;
 }
 
-StringName TagTreeItem::get_path() {
+StringName InternalTag::get_path() {
 	StringName path = "";
 
 	TypedArray<StringName> path_arr = get_path_arr();
@@ -66,7 +71,7 @@ StringName TagTreeItem::get_path() {
 	return path;
 }
 
-void TagTreeItem::populate_children(Array loaded_tags) {
+void InternalTag::populate_children(Array loaded_tags) {
 	for (size_t i = 0; i < loaded_tags.size(); i++)
 	{
 		Variant tag = loaded_tags[i];
@@ -77,7 +82,7 @@ void TagTreeItem::populate_children(Array loaded_tags) {
 			StringName name = (StringName) child_tags[0];
 			add_child(name);
 			
-			TagTreeItem *loaded_tag = cast_to<TagTreeItem>(children[name]);
+			InternalTag *loaded_tag = cast_to<InternalTag>(children[name]);
 			loaded_tag->populate_children(child_tags[1]);
 
 			return;
@@ -88,23 +93,4 @@ void TagTreeItem::populate_children(Array loaded_tags) {
 			add_child(name);
 		}
 	}
-}
-
-Array TagTreeItem::get_children_names_recursive() {
-	Array tags = children.keys();
-
-    for (size_t i = 0; i < tags.size(); i++)
-	{
-		TagTreeItem *tag = cast_to<TagTreeItem>(children[tags[i]]);
-		Array children = tag->get_children_names_recursive();
-		
-		if (children.size() > 0) {
-            Array inner = Array();
-            inner.append(tags[i]);
-			inner.append(children);
-            tags[i] = inner;
-		}
-	}
-
-	return tags;
 }

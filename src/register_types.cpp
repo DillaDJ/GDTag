@@ -8,7 +8,7 @@
 #include "tag_plugin.hpp"
 
 #include "internal/tag_database.hpp"
-#include "internal/tag_tree_item.hpp"
+#include "internal/internal_tag.hpp"
 
 #include "editor/tag_editor.hpp"
 #include "editor/tag_inspector_plugin.h"
@@ -27,7 +27,7 @@ void initialize(ModuleInitializationLevel p_level)
 	{		
 		case MODULE_INITIALIZATION_LEVEL_SCENE:
 			GDREGISTER_INTERNAL_CLASS(TagDatabase);
-			GDREGISTER_INTERNAL_CLASS(TagTreeItem);
+			GDREGISTER_INTERNAL_CLASS(InternalTag);
 			
 			GDREGISTER_CLASS(Tag);
 			GDREGISTER_CLASS(TagContainer);

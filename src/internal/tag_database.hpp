@@ -18,12 +18,12 @@ public:
     void initialize();
     static void uninitialize();
 
-    class TagTreeItem *get_tag(TypedArray<StringName> path_arr);
+    class InternalTag *get_tag(TypedArray<StringName> path_arr);
     class Array get_tags() { return nodes.values(); }
     
-    void add_tag(StringName name, TagTreeItem *parent = nullptr);
-    void remove_tag(TagTreeItem *tag);
-    void rename_tag(TagTreeItem *tag, StringName new_name);
+    InternalTag *add_tag(StringName name, InternalTag *parent = nullptr, bool recalculate = false);
+    void remove_tag(InternalTag *tag);
+    void rename_tag(InternalTag *tag, StringName new_name);
 
     void save() { write_to_file(); }
     
@@ -31,16 +31,22 @@ protected:
     static void _bind_methods();
     
 private:
-    void remove_tag_recursive(TagTreeItem *tag);
+    static TagDatabase *singleton;
+    
+    int next_id = 0;
+
+    Dictionary nodes; // StringName, InternalTag
+    Dictionary id_map; // int, InternalTag
+
+    int get_next_id(InternalTag *tag);
+
+    void remove_tag_recursive(InternalTag *tag);
 
     void read_from_file();
-    void load_tags(Array loaded_tags);
-
+    void load_tags_recursive(Array loaded_tags, InternalTag *parent = nullptr);
+    
     void write_to_file();
+    Array get_children_recursive(InternalTag *tag = nullptr);
 
     StringName get_file_path();
-
-    static TagDatabase *singleton;
-
-    Dictionary nodes; // StringName, TagTreeItem
 };

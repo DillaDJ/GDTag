@@ -38,7 +38,7 @@ protected:
     static void _bind_methods();
 	
 private:
-    void populate_tags_recursive(TreeItem *parent_item, class TagTreeItem *parent_tag);
+    void populate_tags_recursive(TreeItem *parent_item, class InternalTag *parent_tag);
     void toggle_database_signal_connections(bool on);
     
     TreeItem *create_tree_item(TreeItem *parent = nullptr);

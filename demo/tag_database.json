@@ -1,14 +1,24 @@
 [
-	"Shallow",
-	[
-		"Deep",
-		[
-			[
-				"Parent",
-				[
-					"Children"
-				]
-			]
-		]
-	]
+	{
+		"children": [],
+		"id": 0,
+		"tag_name": "Shallow"
+	},
+	{
+		"children": [
+			{
+				"children": [
+					{
+						"children": [],
+						"id": 3,
+						"tag_name": "Children"
+					}
+				],
+				"id": 2,
+				"tag_name": "Parent"
+			}
+		],
+		"id": 1,
+		"tag_name": "Deep"
+	}
 ]

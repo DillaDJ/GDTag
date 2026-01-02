@@ -5,7 +5,7 @@
 
 #include "internal/helpers.hpp"
 #include "internal/tag_database.hpp"
-#include "internal/tag_tree_item.hpp"
+#include "internal/internal_tag.hpp"
 
 #include "tag_editor.hpp"
 #include "tag/tag_container.h"
