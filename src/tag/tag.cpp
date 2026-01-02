@@ -3,28 +3,35 @@
 #include "internal/tag_database.hpp"
 #include "internal/internal_tag.hpp"
 
-InternalTag *Tag::get_tag() {
+void Tag::set_tag(Tag *tag) {
+	link_internal_tag(tag->get_internal_tag());
+}
+
+InternalTag *Tag::get_internal_tag() {
 	TagDatabase *database = TagDatabase::get_singleton();
-    TypedArray<StringName> path_arr = TagHelpers::split_path(tag_path);   
-    InternalTag *tag = database->get_tag(path_arr);
+	InternalTag *tag = database->get_tag(linked_id);
     return tag;
 }
 
+void Tag::link_internal_tag(InternalTag *internal_tag) {
+	linked_id = internal_tag->get_id();
+}
+
 bool Tag::match(Tag *tag) {
-	if (tag == nullptr || tag_path == SNAME("")) {
+	if (tag == nullptr || linked_id == -1) {
 		return false;
 	}
 
-	return tag->get_tag_path() == tag_path;
+	return tag->linked_id == linked_id;
 }
 
 bool Tag::match_inheritance(Tag *tag) {
-	if (tag == nullptr || tag_path == SNAME("")) {
+	if (tag == nullptr || linked_id == -1) {
 		return false;
 	}
 
 	TypedArray<StringName> other_path_arr = TagHelpers::split_path(tag->get_tag_path());
-	TypedArray<StringName> path_arr = TagHelpers::split_path(tag_path);
+	TypedArray<StringName> path_arr = TagHelpers::split_path(get_tag_path());
 
 	if (path_arr.size() == 0 || other_path_arr.size() == 0 || path_arr.size() < other_path_arr.size()) {
 		return false;
@@ -43,31 +50,30 @@ bool Tag::match_inheritance(Tag *tag) {
 	return true;
 }
 
-void Tag::set_tag_path(StringName path) {
-	if (path == SNAME("")) {
-    	// UtilityFunctions::print("No path!");
-		return;
-	}
-
+StringName Tag::get_tag_path() {
 	TagDatabase *database = TagDatabase::get_singleton();
-	
-    TypedArray<StringName> path_arr = TagHelpers::split_path(path);
-    InternalTag *tag = database->get_tag(path_arr);
-	
-	if (tag == nullptr) {
-    	UtilityFunctions::push_error("No tag found with path: " + UtilityFunctions::str(path_arr));
-		return;
-	}
-	
-	// UtilityFunctions::print("Path set.");
-	tag_path = path; 
+	InternalTag *tag = database->get_tag(linked_id);
+	return tag->get_path();
+}
+
+int Tag::get_linked_id() {
+	return linked_id;
 }
 
 void Tag::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("match", "Other Tag"), &Tag::match);
 	ClassDB::bind_method(D_METHOD("match_inheritance", "Other Tag"), &Tag::match_inheritance);
-
-	ClassDB::bind_method(D_METHOD("set_tag_path"), &Tag::set_tag_path);
+	
 	ClassDB::bind_method(D_METHOD("get_tag_path"), &Tag::get_tag_path);
-	ADD_PROPERTY(PropertyInfo(Variant::STRING_NAME, "tag_path"), "set_tag_path", "get_tag_path");
+	ClassDB::bind_method(D_METHOD("set_tag", "Other Tag"), &Tag::set_tag);
+
+	ClassDB::bind_method(D_METHOD("_link_internal_tag", "Internal Tag"), &Tag::link_internal_tag);
+
+	ClassDB::bind_method(D_METHOD("_get_linked_id"), &Tag::get_linked_id);
+	ClassDB::bind_method(D_METHOD("_set_linked_id"), &Tag::set_linked_id);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "_linked_id"), "_set_linked_id", "_get_linked_id");
+}
+
+void Tag::set_linked_id(int value) {
+	linked_id = value;
 }

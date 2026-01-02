@@ -16,4 +16,4 @@ func check_for_tag() -> void:
 	var has_text : String = ("has" if matched == true else "does not have")
 	
 	print_rich("[b]{0}[/color][/b]: The container {1} the tag [b]'{2}'[/b]!"
-		.format([match_text, has_text, tag.tag_path]))
+		.format([match_text, has_text, tag.get_tag_path()]))

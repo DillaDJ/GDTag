@@ -19,7 +19,7 @@ func compare_a_b() -> void:
 		else "[color=red]No Match")
 	
 	print_rich("[b]{1}[/color][/b]: Between [b]'{0}'[/b] and [b]'{2}'[/b]!"
-		.format([tag_a.tag_path, match_text, tag_b.tag_path]))
+		.format([tag_a.get_tag_path(), match_text, tag_b.get_tag_path()]))
 
 func compare_a_b_inheret() -> void:
 	var matched := tag_a.match_inheritance(tag_b)
@@ -28,4 +28,4 @@ func compare_a_b_inheret() -> void:
 		else "[color=red]No Match")
 	
 	print_rich("[b]{1}[/color][/b]: Between the inheritance of [b]'{0}'[/b] and [b]'{2}'[/b]"
-		.format([tag_a.tag_path, match_text, tag_b.tag_path]))
+		.format([tag_a.get_tag_path(), match_text, tag_b.get_tag_path()]))

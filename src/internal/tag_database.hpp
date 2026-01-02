@@ -18,6 +18,7 @@ public:
     void initialize();
     static void uninitialize();
 
+    class InternalTag *get_tag(int id);
     class InternalTag *get_tag(TypedArray<StringName> path_arr);
     class Array get_tags() { return nodes.values(); }
     

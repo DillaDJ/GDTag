@@ -8,17 +8,23 @@ class Tag : public Resource {
     GDCLASS(Tag, Resource);
     
 public:    
-    class InternalTag *get_tag();
+    void set_tag(Tag *tag);
+    
+    class InternalTag *get_internal_tag();
+    void link_internal_tag(InternalTag *internal_tag);
 
     bool match(Tag *tag);
     bool match_inheritance(Tag *tag);
 
-    void set_tag_path(StringName path);
-    StringName get_tag_path() { return tag_path; }
+    StringName get_tag_path();
+
+    int get_linked_id();
 
 protected:
     static void _bind_methods();
 
 private:
-    class StringName tag_path;
+    void set_linked_id(int value);
+
+    int linked_id = -1;
 };

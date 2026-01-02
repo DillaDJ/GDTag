@@ -31,5 +31,7 @@ protected:
 private:
     void get_tag();
 
+    void refresh_button();
+
     Ref<class Tag> tag;
 };

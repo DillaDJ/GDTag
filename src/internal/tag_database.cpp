@@ -43,6 +43,10 @@ void TagDatabase::uninitialize() {
 	singleton = nullptr;
 }
 
+InternalTag *TagDatabase::get_tag(int id) {
+	return id_map.has(id) ? cast_to<InternalTag>(id_map[id]) : nullptr;
+}
+
 InternalTag *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
 	// UtilityFunctions::print("Getting tag with path: " + UtilityFunctions::str(path));
 

@@ -5,157 +5,157 @@
 [ext_resource type="Script" uid="uid://cdaax774hyo1l" path="res://scripts/container_comparing_tag_object.gd" id="3_t6etu"]
 
 [sub_resource type="Tag" id="Tag_t6etu"]
-tag_path = &"Shallow/"
+_linked_id = 0
 
 [sub_resource type="Tag" id="Tag_cpijt"]
-tag_path = &"Shallow/"
+_linked_id = 0
 
 [sub_resource type="Tag" id="Tag_reemd"]
-tag_path = &"Shallow/"
+_linked_id = 0
 
 [sub_resource type="Tag" id="Tag_llj5n"]
-tag_path = &"Deep/"
+_linked_id = 1
 
 [sub_resource type="Tag" id="Tag_iuf4w"]
-tag_path = &"Deep/Parent/"
+_linked_id = 2
 
 [sub_resource type="Tag" id="Tag_paaqm"]
-tag_path = &"Deep/"
+_linked_id = 1
 
 [sub_resource type="Tag" id="Tag_m5l2a"]
-tag_path = &"Deep/Parent/"
+_linked_id = 2
 
 [sub_resource type="Tag" id="Tag_6sieb"]
-tag_path = &"Deep/Parent/Children/"
+_linked_id = 3
 
 [sub_resource type="TagContainer" id="TagContainer_t6etu"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true
 }
 
 [sub_resource type="Tag" id="Tag_q63f0"]
-tag_path = &"Shallow/"
+_linked_id = 0
 
 [sub_resource type="TagContainer" id="TagContainer_cpijt"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true
 }
 
 [sub_resource type="Tag" id="Tag_3vedc"]
-tag_path = &"Deep/Parent/Children/"
+_linked_id = 3
 
 [sub_resource type="TagContainer" id="TagContainer_l0ncq"]
-tag_paths = {
-&"Deep/": true
+_tag_id_map = {
+1: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_wffsx"]
-tag_paths = {
-&"Deep/": true,
-&"Deep/Parent/Children/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+1: true,
+3: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_51o3q"]
-tag_paths = {
-&"Deep/": true
+_tag_id_map = {
+1: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_5vpmp"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Deep/Parent/Children/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true,
+3: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_iuf4w"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_paaqm"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_reemd"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_llj5n"]
-tag_paths = {
-&"Deep/Parent/Children/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+3: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_m5l2a"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Deep/Parent/Children/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true,
+3: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_6sieb"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Deep/Parent/Children/": true
+_tag_id_map = {
+2: true,
+3: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_q63f0"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Deep/Parent/Children/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true,
+3: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_3vedc"]
-tag_paths = {
-&"Deep/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+1: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_d2jd3"]
-tag_paths = {
-&"Deep/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+1: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_gsfgt"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Deep/Parent/Children/": true
+_tag_id_map = {
+2: true,
+3: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_n8c11"]
-tag_paths = {
-&"Deep/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+1: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_huric"]
-tag_paths = {
-&"Deep/": true,
-&"Deep/Parent/": true
+_tag_id_map = {
+1: true,
+2: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_igahw"]
-tag_paths = {
-&"Deep/Parent/": true,
-&"Deep/Parent/Children/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+2: true,
+3: true
 }
 
 [sub_resource type="TagContainer" id="TagContainer_5vrnx"]
-tag_paths = {
-&"Deep/": true,
-&"Deep/Parent/Children/": true,
-&"Shallow/": true
+_tag_id_map = {
+0: true,
+1: true,
+3: true
 }
 
 [node name="Root" type="Node"]

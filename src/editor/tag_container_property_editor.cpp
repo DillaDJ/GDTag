@@ -21,6 +21,9 @@ void TagContainerPropertyEditor::_exit_tree() {
 
 void TagContainerPropertyEditor::initialize(Object *p_owner, String p_property_name) {
     GDTagPropertyEditor::initialize(p_owner, p_property_name);
+    
+    TagDatabase *database = TagDatabase::get_singleton();
+    database->connect("tag_renamed", callable_mp(this, &TagContainerPropertyEditor::refresh_tag_text));
     get_tag_container();
 
     if (tag_container.is_null()) {
@@ -48,11 +51,14 @@ void TagContainerPropertyEditor::toggle_tag_editor() {
         return;
     }
 
-    TypedArray<StringName> paths = tag_container->get_tag_paths();
+    TypedArray<int> ids = tag_container->get_tag_ids();
+    TagDatabase *database = TagDatabase::get_singleton();
 
-    for (size_t i = 0; i < paths.size(); i++)
+    for (size_t i = 0; i < ids.size(); i++)
     {
-        StringName path = (StringName) paths[i];
+        InternalTag *tag = database->get_tag((int) ids[i]);
+        StringName path = tag->get_path();
+        
         TypedArray<StringName> path_arr = TagHelpers::split_path(path);
         editor->check_tag(path_arr);
     }
@@ -73,7 +79,9 @@ void TagContainerPropertyEditor::get_tag_container() {
 
 void TagContainerPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr) {
     TagDatabase *database = TagDatabase::get_singleton();
-    StringName tag_path = TagHelpers::merge_path(tag_path_arr);
+
+    InternalTag *tag = database->get_tag(tag_path_arr);
+    StringName tag_path = tag->get_path();
     
     EditorUndoRedoManager *undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
     undo_redo->create_action("Select tag");
@@ -86,8 +94,8 @@ void TagContainerPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr)
         undo_redo->add_undo_property(owner, property_name, nullptr);
     }
     
-    undo_redo->add_do_method(tag_container.ptr(), "add_tag_path", tag_path);
-    undo_redo->add_undo_method(tag_container.ptr(), "remove_tag_path", tag_path);
+    undo_redo->add_do_method(tag_container.ptr(), "_add_tag_internal", tag);
+    undo_redo->add_undo_method(tag_container.ptr(), "_remove_tag_internal", tag);
 
     undo_redo->add_do_method(this, "refresh_tag_text");
     undo_redo->add_undo_method(this, "refresh_tag_text");
@@ -100,7 +108,9 @@ void TagContainerPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr)
 
 void TagContainerPropertyEditor::unselect_tag(TypedArray<StringName> tag_path_arr) {
     TagDatabase *database = TagDatabase::get_singleton();
-    StringName tag_path = TagHelpers::merge_path(tag_path_arr);
+    
+    InternalTag *tag = database->get_tag(tag_path_arr);
+    StringName tag_path = tag->get_path();
     
     EditorUndoRedoManager *undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
     undo_redo->create_action("Unselect tag");
@@ -113,8 +123,8 @@ void TagContainerPropertyEditor::unselect_tag(TypedArray<StringName> tag_path_ar
         undo_redo->add_undo_property(owner, property_name, nullptr);
     }
     
-    undo_redo->add_do_method(tag_container.ptr(), "remove_tag_path", tag_path);
-    undo_redo->add_undo_method(tag_container.ptr(), "add_tag_path", tag_path);
+    undo_redo->add_do_method(tag_container.ptr(), "_remove_tag_internal", tag);
+    undo_redo->add_undo_method(tag_container.ptr(), "_add_tag_internal", tag);
 
     undo_redo->add_do_method(this, "refresh_tag_text");
     undo_redo->add_undo_method(this, "refresh_tag_text");
@@ -133,11 +143,13 @@ void TagContainerPropertyEditor::refresh_tag_text() {
     int tag_count = tag_container->size();
     
     if (tag_count == 1) {
-        StringName path = (StringName) tag_container->get_tag_paths()[0];
-        select_button->set_text(path);
+        TagDatabase *database = TagDatabase::get_singleton();
+        int id = (int) tag_container->get_tag_ids()[0];
+        
+        select_button->set_text(database->get_tag(id)->get_path());
         return;
     }
     
-    TypedArray<StringName> paths = tag_container->get_tag_paths();
+    TypedArray<int> paths = tag_container->get_tag_ids();
     select_button->set_text("(" + UtilityFunctions::str(tag_count) + ")" + " Tags selected");
 }

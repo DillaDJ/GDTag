@@ -20,6 +20,9 @@ void TagPropertyEditor::_exit_tree() {
 
 void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
     GDTagPropertyEditor::initialize(p_owner, p_property_name);
+    
+    TagDatabase *database = TagDatabase::get_singleton();
+    database->connect("tag_renamed", callable_mp(this, &TagPropertyEditor::refresh_button));
     get_tag();
 
     if (tag.is_null()) {
@@ -27,13 +30,14 @@ void TagPropertyEditor::initialize(Object *p_owner, String p_property_name) {
         return;
     }
 
-    StringName name = tag->get_tag_path();
-    if (name == SNAME("")) {
+    StringName path = tag->get_tag_path();
+    if (path == SNAME("")) {
+        // UtilityFunctions::print("Path is null!");
         select_button->set_text("Select Tag");
         return;
     }
 
-    select_button->set_text(name);
+    select_button->set_text(path);
 }
 
 void TagPropertyEditor::toggle_tag_editor() {
@@ -60,30 +64,39 @@ void TagPropertyEditor::get_tag() {
     tag = var;
 }
 
+void TagPropertyEditor::refresh_button() {
+    String tag_text = tag.is_null() ? "Select Tag" : tag->get_tag_path();
+    select_button->set_text(tag_text);
+}
+
 void TagPropertyEditor::select_tag(TypedArray<StringName> tag_path_arr) {
     TagDatabase *database = TagDatabase::get_singleton();
-    StringName tag_path = TagHelpers::merge_path(tag_path_arr);
+    InternalTag *linked_tag = database->get_tag(tag_path_arr);
     
     EditorUndoRedoManager *undo_redo = EditorInterface::get_singleton()->get_editor_undo_redo();
     undo_redo->create_action("Set tag");
     
-    if (tag.is_null()) {       
+    if (tag.is_null()) {
         Ref<Tag> ref(memnew(Tag));
         tag = ref;
         
         undo_redo->add_do_property(owner, property_name, ref);
         undo_redo->add_undo_property(owner, property_name, nullptr);
     }
-    
-    StringName old_tag_path = tag->get_tag_path();
-    TypedArray<StringName> old_path_arr = TagHelpers::split_path(old_tag_path);
+
+    StringName path = linked_tag->get_path();
+
+    InternalTag *old_linked_tag = database->get_tag(tag->get_linked_id());
+
+    StringName old_path = old_linked_tag->get_path();
+    TypedArray<StringName> old_path_arr = old_linked_tag->get_path_arr();
     
     // UtilityFunctions::print("Setting tag path: '" + tag_path + "'");
-    undo_redo->add_do_method(tag.ptr(), "set_tag_path", tag_path);
-    undo_redo->add_undo_method(tag.ptr(), "set_tag_path", old_tag_path);
+    undo_redo->add_do_method(tag.ptr(), "_link_internal_tag", linked_tag);
+    undo_redo->add_undo_method(tag.ptr(), "_link_internal_tag", old_linked_tag);
 
-    undo_redo->add_do_method(select_button, "set_text", tag_path);
-    undo_redo->add_undo_method(select_button, "set_text", old_tag_path == SNAME("") ? "Select Tag" : old_tag_path);
+    undo_redo->add_do_method(select_button, "set_text", path);
+    undo_redo->add_undo_method(select_button, "set_text", old_path == SNAME("") ? "Select Tag" : old_path);
 
     undo_redo->add_do_method(editor, "uncheck_all_tags");
     undo_redo->add_undo_method(editor, "uncheck_all_tags");
