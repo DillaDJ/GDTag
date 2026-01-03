@@ -12,7 +12,7 @@
 
 TagContainerPropertyEditor::TagContainerPropertyEditor() {
     editor->connect("tag_unselected", callable_mp(this, &TagContainerPropertyEditor::unselect_tag));
-    editor->set_mode(TagEditorMode::SELECT_MULTI);
+    editor->set_mode(TagTreeMode::SELECT_MULTI);
 }
 
 void TagContainerPropertyEditor::_exit_tree() {

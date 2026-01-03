@@ -9,40 +9,48 @@ InternalTag::InternalTag() {
 	id = 0;
 }
 
-InternalTag *InternalTag::add_child(StringName name) {
-    if (children.has(name)) {
-        return nullptr;
-    }
-    
-	InternalTag* tag_item = memnew(InternalTag);
-    tag_item->set_parent(this);
-	tag_item->set_tag_name(name);
-    children[name] = tag_item;
-
-	return tag_item;
-}
-
 void InternalTag::add_child(InternalTag *tag) {
-    StringName name = tag->get_tag_name();
+    int id = tag->get_id();
 
-    if (children.has(name)) {
+    if (children.has(id)) {
         return;
     }
     
-	children[name] = tag;
+	children[id] = tag;
     tag->set_parent(this);
 }
 
-InternalTag *InternalTag::get_child(StringName name) {
-	return children.has(name) ? cast_to<InternalTag>(children[name]) : nullptr;
+InternalTag *InternalTag::get_child(int id) {
+	return children.has(id) ? cast_to<InternalTag>(children[id]) : nullptr;
 }
 
-void InternalTag::remove_child(StringName name) {
-    if (!children.has(name)) return;
+InternalTag *InternalTag::get_child(StringName name) {
+	TagDatabase *database = TagDatabase::get_singleton();
+	Array child_nodes = children.keys();
+
+	for (size_t i = 0; i < child_nodes.size(); i++)
+	{
+		int id = child_nodes[i];
+		InternalTag *tag = database->get_tag(id);
+		if (tag-> get_tag_name() != name) {
+			continue;
+		}
+
+		return tag;
+	}
 	
-    InternalTag *tag = cast_to<InternalTag>(children[name]);
+	return nullptr;
+}
+
+void InternalTag::remove_child(InternalTag *tag) {
+	int id = tag->get_id();
+
+    if (!children.has(id)) {
+		return;
+	}
+	
     tag->set_parent(nullptr);
-    children.erase(name);
+    children.erase(id);
 }
 
 TypedArray<StringName> InternalTag::get_path_arr() {
@@ -69,28 +77,4 @@ StringName InternalTag::get_path() {
 	}
 
 	return path;
-}
-
-void InternalTag::populate_children(Array loaded_tags) {
-	for (size_t i = 0; i < loaded_tags.size(); i++)
-	{
-		Variant tag = loaded_tags[i];
-		
-		if (tag.get_type() == Variant::Type::ARRAY) {
-			Array child_tags = (Array) tag; 
-			
-			StringName name = (StringName) child_tags[0];
-			add_child(name);
-			
-			InternalTag *loaded_tag = cast_to<InternalTag>(children[name]);
-			loaded_tag->populate_children(child_tags[1]);
-
-			return;
-		}
-
-		if (tag.get_type() == Variant::Type::STRING || tag.get_type() == Variant::Type::STRING_NAME) {
-			StringName name = (StringName) tag;
-			add_child(name);
-		}
-	}
 }

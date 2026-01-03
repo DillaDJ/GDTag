@@ -11,7 +11,7 @@
 #include "tag/tag.h"
 
 TagPropertyEditor::TagPropertyEditor() {
-    editor->set_mode(TagEditorMode::SELECT);
+    editor->set_mode(TagTreeMode::SELECT);
 }
 
 void TagPropertyEditor::_exit_tree() {

@@ -50,12 +50,15 @@ InternalTag *TagDatabase::get_tag(int id) {
 InternalTag *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
 	// UtilityFunctions::print("Getting tag with path: " + UtilityFunctions::str(path));
 
-	if (path_arr.size() == 0 || !nodes.has(path_arr[0])) {
+	if (path_arr.size() == 0) {
 		// UtilityFunctions::print("Did not find tag...");
 		return nullptr;
 	}
-	
-	InternalTag *current_tag = Object::cast_to<InternalTag>(nodes[path_arr[0]]);
+
+	InternalTag *current_tag = get_node(nodes[path_arr[0]]);
+	if (current_tag == nullptr) {
+		return nullptr;
+	}
 
 	for (size_t i = 0; i < path_arr.size(); i++)
 	{
@@ -63,7 +66,7 @@ InternalTag *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
 			continue;
 		}
 
-		current_tag = current_tag->get_child(path_arr[i]);
+		current_tag = current_tag->get_child((StringName) path_arr[i]);
 
 		if (current_tag == nullptr) {
 			// UtilityFunctions::print("Did not find tag...");
@@ -75,38 +78,52 @@ InternalTag *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
 	return current_tag;
 }
 
-InternalTag *TagDatabase::add_tag(StringName name, InternalTag* parent, bool recalculate) {
+InternalTag *TagDatabase::add_tag(StringName name, InternalTag* parent) {
 	// UtilityFunctions::print("Adding tag: " + name);
 
 	if (parent == nullptr) {
-		if (nodes.has(name)) {
-			return nullptr;
-		}
-
 		InternalTag* tag_item = memnew(InternalTag);
 		tag_item->set_parent(nullptr);
 		tag_item->set_tag_name(name);
-
-		if (recalculate) {
-			tag_item->set_id(get_next_id(tag_item));
-		}
-
-		nodes[name] = tag_item;
+		tag_item->set_id(get_next_id(tag_item));
+		nodes[tag_item->get_id()] = tag_item;
 		
 		emit_signal("tag_added");
 		// UtilityFunctions::print("Tag added");
 		return tag_item;
 	}
 
-	InternalTag* tag_item = parent->add_child(name);
-	
-	if (recalculate) {
-		tag_item->set_id(get_next_id(tag_item));
-	}
+	InternalTag* tag_item = memnew(InternalTag);
+	tag_item->set_tag_name(name);
+	tag_item->set_id(get_next_id(tag_item));
+	parent->add_child(tag_item);
 
 	emit_signal("tag_added");
 	// UtilityFunctions::print("Tag added");
 	return tag_item;
+}
+
+void TagDatabase::move_tag(InternalTag *moving, InternalTag *to, int positioning) {
+    UtilityFunctions::print(moving->get_path() + SNAME(" to ") 
+        + to->get_path() + ": " + UtilityFunctions::str(positioning));
+
+    if (moving == to) {
+        return;
+    }
+
+    InternalTag *parent = moving->get_parent();
+    if (parent != nullptr) {
+        parent->remove_child(moving);
+    }
+
+	if (to == nullptr) {
+		nodes[moving->get_id()] = moving;
+		emit_signal("tag_moved");
+		return;
+	}
+
+	to->add_child(moving);
+	emit_signal("tag_moved");
 }
 
 void TagDatabase::remove_tag(InternalTag *tag) {
@@ -122,9 +139,7 @@ void TagDatabase::rename_tag(InternalTag* tag, StringName new_name) {
 	// UtilityFunctions::print("Renaming tag: " + name);
 
 	if (parent == nullptr) {
-		nodes.erase(name);
 		tag->set_tag_name(new_name);
-		nodes[new_name] = tag;
 		write_to_file();
 
 		emit_signal("tag_renamed");
@@ -132,7 +147,7 @@ void TagDatabase::rename_tag(InternalTag* tag, StringName new_name) {
 		return;
 	}
 
-	parent->remove_child(name);
+	parent->remove_child(tag);
 	tag->set_tag_name(new_name);
 	parent->add_child(tag);
 	write_to_file();
@@ -144,6 +159,7 @@ void TagDatabase::rename_tag(InternalTag* tag, StringName new_name) {
 void TagDatabase::_bind_methods() {
     ADD_SIGNAL(MethodInfo("tag_added"));
     ADD_SIGNAL(MethodInfo("tag_renamed"));
+    ADD_SIGNAL(MethodInfo("tag_moved"));
     ADD_SIGNAL(MethodInfo("tag_removed"));
 }
 
@@ -156,9 +172,26 @@ int TagDatabase::get_next_id(InternalTag *tag) {
 	return next_id;
 }
 
+InternalTag *TagDatabase::get_node(StringName name) {
+	Array node_ids = nodes.keys();
+
+	for (size_t i = 0; i < node_ids.size(); i++)
+	{
+		int id = node_ids[i];
+		InternalTag *tag = cast_to<InternalTag>(id_map[id]);
+		if (tag->get_tag_name() != name) {
+			continue;
+		}
+
+		return tag;
+	}
+	
+	return nullptr;
+}
+
 void TagDatabase::remove_tag_recursive(InternalTag *tag) {
 	InternalTag *parent = tag->get_parent();
-    StringName name = tag->get_tag_name();
+    int id = tag->get_id();
 	// UtilityFunctions::print("Removing tag: " + name);
 
 	Array children = tag->get_children();
@@ -170,13 +203,13 @@ void TagDatabase::remove_tag_recursive(InternalTag *tag) {
 	}	
 	
 	if (parent == nullptr) {
-		nodes.erase(name);
+		nodes.erase(id);
 		memdelete(tag);
 		// UtilityFunctions::print("Tag deleted");
 		return;
 	}
 
-	parent->remove_child(name);
+	parent->remove_child(tag);
 	memdelete(tag);
 	// UtilityFunctions::print("Inner Tag deleted");
 }
@@ -208,12 +241,21 @@ void TagDatabase::load_tags_recursive(Array loaded_tags, InternalTag *parent) {
 		StringName name = tag["tag_name"];
 		int id = tag["id"];
 		Array children = tag["children"];
-
-		InternalTag *loaded_tag = add_tag(name, parent);
 		
+		InternalTag *loaded_tag = memnew(InternalTag);
 		next_id = UtilityFunctions::max(id, next_id);
 		loaded_tag->set_id(id);
 		id_map[id] = loaded_tag;
+
+		if (parent == nullptr) {
+			loaded_tag->set_parent(nullptr);
+			loaded_tag->set_tag_name(name);
+			nodes[id] = loaded_tag;
+		}
+		else {
+			loaded_tag->set_tag_name(name);
+			parent->add_child(loaded_tag);
+		}
 		
 		if (children.size() == 0) {
 			continue;
@@ -221,10 +263,10 @@ void TagDatabase::load_tags_recursive(Array loaded_tags, InternalTag *parent) {
 
 		InternalTag *next_parent = nullptr;
 		if (parent == nullptr) {
-			next_parent = cast_to<InternalTag>(nodes[name]);
+			next_parent = cast_to<InternalTag>(nodes[id]);
 		}
 		else {
-			next_parent = parent->get_child(name);
+			next_parent = parent->get_child(id);
 		}
 
 		load_tags_recursive(children, next_parent);
@@ -249,25 +291,25 @@ void TagDatabase::write_to_file() {
 
 Array TagDatabase::get_children_recursive(InternalTag *tag) {
 	Array tags = Array();
-	Array top_tag_names;
+	Array top_tag_ids;
 
 	if (tag == nullptr) {
-		top_tag_names = nodes.keys();
+		top_tag_ids = nodes.keys();
 	}
 	else {
-		top_tag_names = tag->get_child_names();
+		top_tag_ids = tag->get_child_ids();
 	}
 
-	for (size_t i = 0; i < top_tag_names.size(); i++)
+	for (size_t i = 0; i < top_tag_ids.size(); i++)
 	{
-		StringName tag_name = top_tag_names[i];
+		StringName tag_id = top_tag_ids[i];
 		InternalTag *internal_tag = nullptr;
 
 		if (tag == nullptr) {
-			internal_tag = cast_to<InternalTag>(nodes[tag_name]);
+			internal_tag = cast_to<InternalTag>(nodes[tag_id]);
 		}
 		else {
-			internal_tag = tag->get_child(tag_name);
+			internal_tag = tag->get_child(tag_id);
 		}
 
 		if (internal_tag == nullptr){

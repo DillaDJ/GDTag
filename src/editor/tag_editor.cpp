@@ -12,7 +12,6 @@
 
 TagEditor::TagEditor() {
     set_name("Tag Editor");
-    mode = TagEditorMode::READ;
     unnamed = false;
 
     database = TagDatabase::get_singleton();
@@ -52,11 +51,10 @@ TagEditor::TagEditor() {
     tree_container = memnew(PanelContainer);
     tree_container->set_v_size_flags(SIZE_EXPAND | SIZE_FILL);
 
-    tag_tree = memnew(Tree);
+    tag_tree = memnew(TagEditorTree);
     tag_tree->connect("empty_clicked", callable_mp(this, &TagEditor::empty_clicked));
     tag_tree->connect("item_activated", callable_mp(this, &TagEditor::prompt_selected_tag_rename));
     tag_tree->connect("item_edited", callable_mp(this, &TagEditor::update_tag_database));
-    tag_tree->set_hide_root(true);
 
     tree_container->add_child(tag_tree);
     main_vbox->add_child(tree_container);
@@ -116,96 +114,30 @@ void TagEditor::_bind_methods() {
     ADD_SIGNAL(MethodInfo("tag_unselected", PropertyInfo(Variant::ARRAY, "tag_path")));
 }
 
-void TagEditor::set_mode(TagEditorMode p_mode) {
-    tag_tree->set_columns(p_mode == TagEditorMode::READ ? 1 : 2);
-    mode = p_mode; 
-    
-    if (p_mode == TagEditorMode::READ) { return; }
-
-    tag_tree->set_column_expand(1, false);
-}
-
 void TagEditor::refresh_tags() {
-    tag_tree->clear();
-    root = tag_tree->create_item();
-    populate_tags_recursive(nullptr, nullptr);
-}
-
-void TagEditor::check_tag(TypedArray<StringName> path_arr) {
-    if (mode == TagEditorMode::READ || path_arr.size() == 0) {
-        return;
-    }
-
-    TreeItem *item = get_item_from_path_arr(path_arr);
-    if (item == nullptr) {
-        return;
-    }
-
-    item->set_checked(1, true);
-}
-
-void TagEditor::uncheck_tag(TypedArray<StringName> path_arr) {
-    if (mode == TagEditorMode::READ || path_arr.size() == 0) {
-        return;
-    }
-
-    TreeItem *item = get_item_from_path_arr(path_arr);
-    if (item == nullptr) {
-        return;
-    }
-
-    item->set_checked(1, false);
-}
-
-void TagEditor::uncheck_all_tags() {
-    uncheck_recursive(root);
-}
-
-void TagEditor::populate_tags_recursive(TreeItem *parent_item, InternalTag *parent_tag) {
-    Array children = parent_tag == nullptr ? database->get_tags() : parent_tag->get_children();
-
-    for (size_t i = 0; i < children.size(); i++)
-    {
-        InternalTag *tag = cast_to<InternalTag>(children[i]);
-        // UtilityFunctions::print(tag->get_tag_name());
-
-        TreeItem *item = create_tree_item(parent_item == nullptr ? root : parent_item);
-        item->set_text(0, tag->get_tag_name());
-        
-        populate_tags_recursive(item, tag);
-    }
+    tag_tree->reset();
 }
 
 void TagEditor::toggle_database_signal_connections(bool on) {
     if (on) {
         database->connect("tag_added", callable_mp(this, &TagEditor::refresh_tags));
         database->connect("tag_renamed", callable_mp(this, &TagEditor::refresh_tags));
+        database->connect("tag_moved", callable_mp(this, &TagEditor::refresh_tags));
         database->connect("tag_removed", callable_mp(this, &TagEditor::refresh_tags));
         return;
     }
     
     database->disconnect("tag_added", callable_mp(this, &TagEditor::refresh_tags));
     database->disconnect("tag_renamed", callable_mp(this, &TagEditor::refresh_tags));
+    database->disconnect("tag_moved", callable_mp(this, &TagEditor::refresh_tags));
     database->disconnect("tag_removed", callable_mp(this, &TagEditor::refresh_tags));
-}
-
-TreeItem *TagEditor::create_tree_item(TreeItem *parent) {
-// 	// UtilityFunctions::print("\nAdding new tag to " + (parent == root ? "root" : parent->get_text(0)) + "...");
-    TreeItem *item = tag_tree->create_item(parent);
-    
-    if (mode != TagEditorMode::READ) {
-        item->set_cell_mode(1, TreeItem::CELL_MODE_CHECK);
-        item->set_editable(1, true);
-    }
-
-    return item;
 }
 
 void TagEditor::add_tag() {
 	TreeItem *selected_item = tag_tree->get_selected();
-    TreeItem *parent = selected_item == nullptr ? root : selected_item;
+    TreeItem *parent = selected_item == nullptr ? tag_tree->root() : selected_item;
     
-    TreeItem *item = create_tree_item(selected_item);
+    TreeItem *item = tag_tree->create_tree_item(selected_item);
     item->set_text(0, "NewTag" + UtilityFunctions::str(parent->get_child_count()));
     item->select(0);
 
@@ -218,7 +150,7 @@ void TagEditor::toggle_select_tag() {
     TreeItem *checked_item = tag_tree->get_edited();
     
     if (!checked_item->is_checked(1)) {
-        if (mode == TagEditorMode::SELECT) {
+        if (tag_tree->get_mode() == TagTreeMode::SELECT) {
             checked_item->set_checked(1, true);
             return;
         }
@@ -228,26 +160,12 @@ void TagEditor::toggle_select_tag() {
         return;
     }
     
-    if (mode == TagEditorMode::SELECT) {
-        uncheck_recursive(root);
+    if (tag_tree->get_mode() == TagTreeMode::SELECT) {
+        uncheck_all_tags();
         checked_item->set_checked(1, true);
     }
 
     emit_signal("tag_selected", path_arr);
-}
-
-void TagEditor::uncheck_recursive(TreeItem *item) {
-    if (item->get_child_count() == 0) {
-        return;
-    }
-
-    TreeItem *child = item->get_first_child();
-
-    while (child != nullptr) {
-        child->set_checked(1, false);
-        uncheck_recursive(child);
-        child = child->get_next();
-    }
 }
 
 void TagEditor::prompt_delete_tag() {
@@ -270,7 +188,7 @@ void TagEditor::delete_selected_tag() {
         return;
     }
 
-    if (mode != TagEditorMode::READ) {
+    if (tag_tree->get_mode() != TagTreeMode::READ) {
         selected_item->set_checked(1, false);
     }
     
@@ -342,7 +260,7 @@ void TagEditor::update_tag_database() {
             return;
         }
         
-        if (mode != TagEditorMode::READ && selected_item->is_selected(1)) {
+        if (tag_tree->get_mode() != TagTreeMode::READ && selected_item->is_selected(1)) {
             toggle_select_tag();
             toggle_database_signal_connections(true);
             return;
@@ -374,7 +292,7 @@ void TagEditor::update_tag_database() {
 
 void TagEditor::add_new_tag(TypedArray<StringName> selected_tag_path_arr, StringName tag_name) {
     if (selected_tag_path_arr.size() <= 1) {
-        database->add_tag(tag_name, nullptr, true);
+        database->add_tag(tag_name, nullptr);
         database->save();
         return;
     }
@@ -385,7 +303,7 @@ void TagEditor::add_new_tag(TypedArray<StringName> selected_tag_path_arr, String
     InternalTag *parent = database->get_tag(selected_tag_path_arr);
     
     // UtilityFunctions::print("Adding tag with parent...");
-    database->add_tag(tag_name, parent, true);
+    database->add_tag(tag_name, parent);
     database->save();   
 }
 
@@ -455,63 +373,10 @@ void TagEditor::remove_unnamed() {
 
 TypedArray<StringName> TagEditor::get_selected_tag_path_arr() {    
     TreeItem *item = tag_tree->get_selected();
-    return get_tag_path_arr(item);
+    return tag_tree->get_tag_path_arr(item);
 }
 
 TypedArray<StringName> TagEditor::get_edited_tag_path_arr() {
     TreeItem *item = tag_tree->get_edited();
-    return get_tag_path_arr(item);
-}
-
-TypedArray<StringName> TagEditor::get_tag_path_arr(TreeItem *item) {
-    TypedArray<StringName> path = TypedArray<StringName>();
-    
-    if (item == nullptr || item == root) {
-        return path;
-    }
-    
-    while (item != root) {
-        path.append(item->get_text(0));
-        item = item->get_parent();
-    }
-
-    path.reverse();
-	return path;
-}
-
-TreeItem *TagEditor::get_item_from_path_arr(TypedArray<StringName> path_arr) {
-    path_arr = path_arr.duplicate(); // Prevents passed in array from being modified
-
-    // UtilityFunctions::print("Checking tag with path:");
-    // UtilityFunctions::print(path_arr);
-
-    if (root->get_child_count() == 0 || path_arr.size() == 0) {
-        return nullptr;
-    }
-
-    StringName node = (StringName) path_arr.pop_front();
-    TreeItem *child = root->get_first_child();
-
-    while (child != nullptr)
-    {
-        // UtilityFunctions::print("\nNode: '" + node + "' Child: '" + child->get_text(0) + "'");
-
-        if (child->get_text(0) == node) {
-            if (path_arr.size() == 0) {
-                child->set_checked(1, true);
-                // UtilityFunctions::print("Found node to check!");
-                return child;
-            }
-
-            // UtilityFunctions::print("Found node... getting first child.");
-            child = child->get_first_child();
-            node = (StringName) path_arr.pop_front();
-        }
-        else {
-            child = child->get_next();
-            // UtilityFunctions::print("Not this... getting next child");
-        }
-    }
-
-    return nullptr;
+    return tag_tree->get_tag_path_arr(item);
 }

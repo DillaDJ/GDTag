@@ -20,9 +20,10 @@ public:
 
     class InternalTag *get_tag(int id);
     class InternalTag *get_tag(TypedArray<StringName> path_arr);
-    class Array get_tags() { return nodes.values(); }
+    class Array get_nodes() { return nodes.values(); }
     
-    InternalTag *add_tag(StringName name, InternalTag *parent = nullptr, bool recalculate = false);
+    InternalTag *add_tag(StringName name, InternalTag *parent = nullptr);
+    void move_tag(InternalTag *moving, InternalTag *to, int positioning);
     void remove_tag(InternalTag *tag);
     void rename_tag(InternalTag *tag, StringName new_name);
 
@@ -36,10 +37,12 @@ private:
     
     int next_id = 0;
 
-    Dictionary nodes; // StringName, InternalTag
+    Dictionary nodes; // int, InternalTag
     Dictionary id_map; // int, InternalTag
 
     int get_next_id(InternalTag *tag);
+
+    InternalTag *get_node(StringName name);
 
     void remove_tag_recursive(InternalTag *tag);
 
