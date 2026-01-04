@@ -20,7 +20,7 @@ public:
 
     class InternalTag *get_tag(int id);
     class InternalTag *get_tag(TypedArray<StringName> path_arr);
-    class Array get_nodes() { return nodes.values(); }
+    class Array get_nodes();
     
     InternalTag *add_tag(StringName name, InternalTag *parent = nullptr);
     void move_tag(InternalTag *moving, InternalTag *to, int positioning);
@@ -39,6 +39,7 @@ private:
 
     Dictionary nodes; // int, InternalTag
     Dictionary id_map; // int, InternalTag
+    Dictionary order_map; // int (id), int (order)
 
     int get_next_id(InternalTag *tag);
 
@@ -53,4 +54,10 @@ private:
     Array get_children_recursive(InternalTag *tag = nullptr);
 
     StringName get_file_path();
+
+    void recalculate_order(InternalTag *parent, InternalTag *around = nullptr);
+    void recalculate_order_from_reposition(int on_tag_id, int with_tag_id, bool above);
+
+    bool sort_id(Variant a, Variant b);
+    bool sort_tag(InternalTag *a, InternalTag *b);
 };

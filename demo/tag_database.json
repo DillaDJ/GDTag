@@ -2,23 +2,21 @@
 	{
 		"children": [],
 		"id": 0,
-		"tag_name": "Shallow"
+		"tag_name": "A"
 	},
 	{
-		"children": [
-			{
-				"children": [
-					{
-						"children": [],
-						"id": 3,
-						"tag_name": "Child"
-					}
-				],
-				"id": 2,
-				"tag_name": "Parent"
-			}
-		],
+		"children": [],
 		"id": 1,
-		"tag_name": "Deep"
+		"tag_name": "B"
+	},
+	{
+		"children": [],
+		"id": 2,
+		"tag_name": "C"
+	},
+	{
+		"children": [],
+		"id": 3,
+		"tag_name": "D"
 	}
 ]

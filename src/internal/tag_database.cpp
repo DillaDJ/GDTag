@@ -34,6 +34,8 @@ TagDatabase::~TagDatabase() {
 
 void TagDatabase::initialize() {
 	nodes = Dictionary();
+	id_map = Dictionary();
+	order_map = Dictionary();
 	next_id = 0;
 	read_from_file();
 }
@@ -48,15 +50,16 @@ InternalTag *TagDatabase::get_tag(int id) {
 }
 
 InternalTag *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
-	// UtilityFunctions::print("Getting tag with path: " + UtilityFunctions::str(path));
+	// UtilityFunctions::print("Getting tag with path: " + UtilityFunctions::str(path_arr));
 
 	if (path_arr.size() == 0) {
-		// UtilityFunctions::print("Did not find tag...");
+		// UtilityFunctions::print("Array too small...");
 		return nullptr;
 	}
 
-	InternalTag *current_tag = get_node(nodes[path_arr[0]]);
+	InternalTag *current_tag = get_node(path_arr[0]);
 	if (current_tag == nullptr) {
+		// UtilityFunctions::print("Did not find node... " + (StringName) path_arr[0]);
 		return nullptr;
 	}
 
@@ -69,13 +72,19 @@ InternalTag *TagDatabase::get_tag(TypedArray<StringName> path_arr) {
 		current_tag = current_tag->get_child((StringName) path_arr[i]);
 
 		if (current_tag == nullptr) {
-			// UtilityFunctions::print("Did not find tag...");
+			// UtilityFunctions::print("Did not find child... " + (StringName) path_arr[i]);
 			return nullptr;
 		}
 	}
 
-	// UtilityFunctions::print("Found tag: " + (current_tag->get_name()));
+	// UtilityFunctions::print("Found tag: " + (current_tag->get_path()));
 	return current_tag;
+}
+
+Array TagDatabase::get_nodes() {
+	Array nodes_tags = nodes.values();
+	nodes_tags.sort_custom(callable_mp(this, &TagDatabase::sort_tag));
+	return nodes_tags;
 }
 
 InternalTag *TagDatabase::add_tag(StringName name, InternalTag* parent) {
@@ -87,6 +96,7 @@ InternalTag *TagDatabase::add_tag(StringName name, InternalTag* parent) {
 		tag_item->set_tag_name(name);
 		tag_item->set_id(get_next_id(tag_item));
 		nodes[tag_item->get_id()] = tag_item;
+		order_map[tag_item->get_id()] = nodes.size() - 1;
 		
 		emit_signal("tag_added");
 		// UtilityFunctions::print("Tag added");
@@ -97,6 +107,7 @@ InternalTag *TagDatabase::add_tag(StringName name, InternalTag* parent) {
 	tag_item->set_tag_name(name);
 	tag_item->set_id(get_next_id(tag_item));
 	parent->add_child(tag_item);
+	order_map[tag_item->get_id()] = parent->get_child_ids().size() - 1;
 
 	emit_signal("tag_added");
 	// UtilityFunctions::print("Tag added");
@@ -104,25 +115,73 @@ InternalTag *TagDatabase::add_tag(StringName name, InternalTag* parent) {
 }
 
 void TagDatabase::move_tag(InternalTag *moving, InternalTag *to, int positioning) {
-    UtilityFunctions::print(moving->get_path() + SNAME(" to ") 
+    UtilityFunctions::print(SNAME("\n") + moving->get_path() + SNAME(" to ") 
         + to->get_path() + ": " + UtilityFunctions::str(positioning));
 
     if (moving == to) {
         return;
     }
-
+	
+	int moving_id = moving->get_id();
+	StringName moving_name = moving->get_tag_name();
     InternalTag *parent = moving->get_parent();
+    InternalTag *to_parent = (positioning == 1 || positioning == -1) ? to->get_parent() : to;
+
+	if ((to_parent != nullptr && to_parent->get_child(moving_name) != nullptr) 
+		|| (to_parent == nullptr && get_node(moving_name))) 
+	{
+		InternalTag *duplicate_tag = (to_parent != nullptr ? to_parent->get_child(moving_name) : get_node(moving_name));
+		if (duplicate_tag != moving) {
+			UtilityFunctions::push_error("Multiple tags with the same name under the same parent is forbidden!");
+			return;
+		}
+	}
+
+	// 'to' should never be nullptr in the case of 0, 1 or -1
+	if (positioning == 0) {
+		recalculate_order(parent, moving);
+		order_map[moving_id] = to->get_child_ids().size();
+		UtilityFunctions::print(moving->get_tag_name() + SNAME(" - New order: ") 
+			+ UtilityFunctions::str(to->get_child_ids().size()));
+	}
+	else if (positioning == 1) {
+		recalculate_order_from_reposition(moving->get_id(), to->get_id(), false);
+	}
+	else if (positioning == -1) {
+		recalculate_order_from_reposition(moving->get_id(), to->get_id(), true);
+	}
+	else if (positioning == -100) {
+		recalculate_order(parent, moving);
+		order_map[moving_id] = nodes.size() - (parent == nullptr ? 1 : 0);
+		UtilityFunctions::print(moving->get_tag_name() + SNAME(" - New order: ") 
+			+ UtilityFunctions::str(nodes.size() - (parent == nullptr ? 1 : 0)));
+	}
+		
+	to = to_parent;
+	if (parent == to) {
+		save();
+		emit_signal("tag_moved");
+		return;
+	}
+
     if (parent != nullptr) {
         parent->remove_child(moving);
     }
+	else if (nodes.has(moving_id)) {
+		nodes.erase(moving_id);
+	}
 
 	if (to == nullptr) {
-		nodes[moving->get_id()] = moving;
+		nodes[moving_id] = moving;
+		save();
+
 		emit_signal("tag_moved");
 		return;
 	}
 
 	to->add_child(moving);
+	save();
+
 	emit_signal("tag_moved");
 }
 
@@ -174,12 +233,14 @@ int TagDatabase::get_next_id(InternalTag *tag) {
 
 InternalTag *TagDatabase::get_node(StringName name) {
 	Array node_ids = nodes.keys();
+	// UtilityFunctions::print(SNAME("Getting node: '") + name + "'");
 
 	for (size_t i = 0; i < node_ids.size(); i++)
 	{
 		int id = node_ids[i];
 		InternalTag *tag = cast_to<InternalTag>(id_map[id]);
 		if (tag->get_tag_name() != name) {
+        	// UtilityFunctions::print(tag->get_tag_name() + SNAME(" is not '") + name + "'");
 			continue;
 		}
 
@@ -223,6 +284,10 @@ void TagDatabase::read_from_file() {
 
 	String content = file->get_as_text();
 	file->close();
+	
+	if (content == "[]") {
+		return;
+	}
 
 	Variant result = JSON::parse_string(content);
 	if (!result) {
@@ -238,23 +303,27 @@ void TagDatabase::load_tags_recursive(Array loaded_tags, InternalTag *parent) {
 	for (size_t i = 0; i < loaded_tags.size(); i++)
 	{
 		Dictionary tag = (Dictionary) loaded_tags[i];
-		StringName name = tag["tag_name"];
+		StringName tag_name = tag["tag_name"];
 		int id = tag["id"];
 		Array children = tag["children"];
 		
+		UtilityFunctions::print("Loading tag: " + tag_name);
+
 		InternalTag *loaded_tag = memnew(InternalTag);
 		next_id = UtilityFunctions::max(id, next_id);
 		loaded_tag->set_id(id);
 		id_map[id] = loaded_tag;
-
+		
 		if (parent == nullptr) {
 			loaded_tag->set_parent(nullptr);
-			loaded_tag->set_tag_name(name);
+			loaded_tag->set_tag_name(tag_name);
 			nodes[id] = loaded_tag;
+			order_map[id] = nodes.size() - 1;
 		}
 		else {
-			loaded_tag->set_tag_name(name);
+			loaded_tag->set_tag_name(tag_name);
 			parent->add_child(loaded_tag);
+			order_map[id] = parent->get_child_ids().size() - 1;
 		}
 		
 		if (children.size() == 0) {
@@ -295,6 +364,7 @@ Array TagDatabase::get_children_recursive(InternalTag *tag) {
 
 	if (tag == nullptr) {
 		top_tag_ids = nodes.keys();
+		top_tag_ids.sort_custom(callable_mp(this, &TagDatabase::sort_id));
 	}
 	else {
 		top_tag_ids = tag->get_child_ids();
@@ -302,7 +372,7 @@ Array TagDatabase::get_children_recursive(InternalTag *tag) {
 
 	for (size_t i = 0; i < top_tag_ids.size(); i++)
 	{
-		StringName tag_id = top_tag_ids[i];
+		int tag_id = top_tag_ids[i];
 		InternalTag *internal_tag = nullptr;
 
 		if (tag == nullptr) {
@@ -332,4 +402,73 @@ StringName TagDatabase::get_file_path() {
 	Variant path = settings->get_setting("GD_tag/tag_database_location");
 	// UtilityFunctions::print(path);
 	return (StringName) path + SNAME("/tag_database.json");
+}
+
+void TagDatabase::recalculate_order(InternalTag *parent, InternalTag *around) {
+	Array children = parent != nullptr ? parent->get_child_ids() : nodes.keys();
+	children.sort_custom(callable_mp(this, &TagDatabase::sort_id));
+
+	if (around != nullptr) {
+		children.erase(around->get_id());
+	}
+
+	for (size_t i = 0; i < children.size(); i++)
+	{		
+		UtilityFunctions::print(cast_to<InternalTag>(id_map[children[i]])->get_tag_name() + 
+		SNAME(" : ") + UtilityFunctions::str(order_map[children[i]]) + SNAME("->") 
+		+ UtilityFunctions::str(i));
+		
+		order_map[children[i]] = i;
+	}
+}
+
+void TagDatabase::recalculate_order_from_reposition(int on_tag_id, int with_tag_id, bool above) {
+	InternalTag *on = cast_to<InternalTag>(id_map[on_tag_id]);
+	InternalTag *on_parent = on != nullptr ? on->get_parent() : nullptr;
+	
+	InternalTag *with = cast_to<InternalTag>(id_map[with_tag_id]);
+	InternalTag *with_parent = with != nullptr ? with->get_parent() : nullptr;
+	Array with_children = with_parent != nullptr ? with_parent->get_child_ids() : nodes.keys();
+	with_children.erase(on_tag_id);
+	with_children.sort_custom(callable_mp(this, &TagDatabase::sort_id));
+
+	int adjust = 0;
+	int new_order = (int) order_map[with_tag_id] + (above 
+		? ((int) order_map[with_tag_id] > (int) order_map[on_tag_id] ? -1 : 0) 
+		: ((int) order_map[with_tag_id] < (int) order_map[on_tag_id] ? 1 : 0)
+	);
+
+	UtilityFunctions::print("To: ");
+	for (size_t i = 0; i < with_children.size(); i++)
+	{
+		if (new_order <= i) {
+			adjust = 1;
+		}
+
+		int adjusted_order = i + adjust;
+		
+		UtilityFunctions::print(cast_to<InternalTag>(id_map[with_children[i]])->get_tag_name() + 
+		SNAME(" : ") + UtilityFunctions::str(order_map[with_children[i]]) + SNAME("->") 
+		+ UtilityFunctions::str(adjusted_order));
+		
+		order_map[with_children[i]] = adjusted_order;
+	}
+
+	UtilityFunctions::print(on->get_tag_name() + SNAME(" - New order: ") + UtilityFunctions::str(new_order));
+	order_map[on_tag_id] = new_order;
+		
+	if (on_parent == with_parent) {
+		return;
+	}
+
+	UtilityFunctions::print("From: ");
+	recalculate_order(on_parent, on);
+}
+
+bool TagDatabase::sort_id(Variant a, Variant b) {
+	return (int) order_map[a] < (int) order_map[b];
+}
+
+bool TagDatabase::sort_tag(InternalTag *a, InternalTag *b) {
+	return (int) order_map[a->get_id()] < (int) order_map[b->get_id()];
 }

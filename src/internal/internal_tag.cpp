@@ -6,6 +6,7 @@
 
 InternalTag::InternalTag() {
     children = Dictionary();
+	parent = nullptr;
 	id = 0;
 }
 

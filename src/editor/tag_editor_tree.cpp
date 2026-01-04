@@ -129,8 +129,11 @@ TreeItem *TagEditorTree::get_item_from_path_arr(TypedArray<StringName> path_arr)
 }
 
 Variant TagEditorTree::_get_drag_data(const Vector2 &p_at_position) {
+    // UtilityFunctions::print("Drag start");
+
     TreeItem *drag_item = get_item_at_position(p_at_position);
     if (drag_item == nullptr) {
+        // UtilityFunctions::print("No item?");
         return nullptr;
     }
     
@@ -139,17 +142,21 @@ Variant TagEditorTree::_get_drag_data(const Vector2 &p_at_position) {
     set_drag_preview(drag_label);
 
     InternalTag *tag = database->get_tag(get_tag_path_arr(drag_item));
+    // UtilityFunctions::print(tag->get_path());
 	return tag;
 }
 
-bool TagEditorTree::_can_drop_data(const Vector2 &p_at_position, const Variant &p_data) {
+bool TagEditorTree::_can_drop_data(const Vector2 &p_at_position, const Variant &p_data) {    
     set_drop_mode_flags(Tree::DROP_MODE_INBETWEEN | Tree::DROP_MODE_ON_ITEM);
 	return true;
 }
 
 void TagEditorTree::_drop_data(const Vector2 &p_at_position, const Variant &p_data) {
+    // UtilityFunctions::print("Drop!");
+
     InternalTag *tag = cast_to<InternalTag>(p_data);
     if (tag == nullptr) {
+        // UtilityFunctions::print("Where tag...");
         return;
     }
 
