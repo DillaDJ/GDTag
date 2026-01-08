@@ -145,7 +145,31 @@ void TagDatabase::move_tag(InternalTag *moving, InternalTag *to, int positioning
 			+ UtilityFunctions::str(to->get_child_ids().size()));
 	}
 	else if (positioning == 1) {
-		recalculate_order_from_reposition(moving->get_id(), to->get_id(), false);
+		if (to->get_child_ids().size() > 0) {
+			InternalTag *first = get_child_with_order(to, 0);
+
+			if (first == nullptr) {
+				return;
+			}
+			
+			recalculate_order_from_reposition(moving->get_id(), first->get_id(), true);
+			
+			if (parent != nullptr) {
+				parent->remove_child(moving);
+			}
+			else if (nodes.has(moving_id)) {
+				nodes.erase(moving_id);
+			}
+
+			to->add_child(moving);
+			save();
+
+			emit_signal("tag_moved");
+			return;
+		}
+		else {
+			recalculate_order_from_reposition(moving->get_id(), to->get_id(), false);
+		}
 	}
 	else if (positioning == -1) {
 		recalculate_order_from_reposition(moving->get_id(), to->get_id(), true);
@@ -402,6 +426,26 @@ StringName TagDatabase::get_file_path() {
 	Variant path = settings->get_setting("GD_tag/tag_database_location");
 	// UtilityFunctions::print(path);
 	return (StringName) path + SNAME("/tag_database.json");
+}
+
+InternalTag *TagDatabase::get_child_with_order(InternalTag *parent, int order) {
+	Array ids = parent->get_child_ids();
+
+	if (ids.size() == 0) {
+		return nullptr;
+	}
+
+	for (size_t i = 0; i < ids.size(); i++)
+	{
+		int id = ids[i];
+		if ((int) order_map[id] != order) {
+			continue;;
+		}
+
+		return cast_to<InternalTag>(id_map[id]);
+	}
+
+	return nullptr;
 }
 
 void TagDatabase::recalculate_order(InternalTag *parent, InternalTag *around) {

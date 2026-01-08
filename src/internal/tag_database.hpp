@@ -29,6 +29,9 @@ public:
 
     void save() { write_to_file(); }
     
+    bool sort_id(Variant a, Variant b);
+    bool sort_tag(InternalTag *a, InternalTag *b);
+
 protected:
     static void _bind_methods();
     
@@ -55,9 +58,9 @@ private:
 
     StringName get_file_path();
 
-    void recalculate_order(InternalTag *parent, InternalTag *around = nullptr);
+	InternalTag *get_child_with_order(InternalTag *parent, int order);
+
+	void recalculate_order(InternalTag *parent, InternalTag *around = nullptr);
     void recalculate_order_from_reposition(int on_tag_id, int with_tag_id, bool above);
 
-    bool sort_id(Variant a, Variant b);
-    bool sort_tag(InternalTag *a, InternalTag *b);
 };

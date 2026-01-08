@@ -1,7 +1,8 @@
 #include "internal_tag.hpp"
-#include "internal/helpers.hpp"
 #include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/variant/callable_method_pointer.hpp>
 
+#include "internal/helpers.hpp"
 #include "internal/tag_database.hpp"
 
 InternalTag::InternalTag() {
@@ -43,6 +44,12 @@ InternalTag *InternalTag::get_child(StringName name) {
 	return nullptr;
 }
 
+Array InternalTag::get_children() {
+	Array child_tags = children.values();
+	child_tags.sort_custom(callable_mp(this, &InternalTag::sort_tag));
+	return child_tags;
+}
+
 void InternalTag::remove_child(InternalTag *tag) {
 	int id = tag->get_id();
 
@@ -78,4 +85,10 @@ StringName InternalTag::get_path() {
 	}
 
 	return path;
+}
+
+bool InternalTag::sort_tag(InternalTag *a, InternalTag *b) {
+	TagDatabase *database = TagDatabase::get_singleton();
+	return database->sort_tag(a, b);
+	
 }

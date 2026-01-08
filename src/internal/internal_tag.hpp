@@ -21,7 +21,7 @@ public:
     
     InternalTag *get_child(int id);
     InternalTag *get_child(StringName name);
-    Array get_children() { return children.values(); }
+    Array get_children();
 
     void remove_child(InternalTag *tag);
     
@@ -47,4 +47,6 @@ private:
     Dictionary children; // ID, InternalTag
 
     StringName tag_name;
+
+	bool sort_tag(InternalTag *a, InternalTag *b);
 };
