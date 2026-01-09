@@ -60,7 +60,8 @@ private:
 
 	InternalTag *get_child_with_order(InternalTag *parent, int order);
 
-	void recalculate_order(InternalTag *parent, InternalTag *around = nullptr);
-    void recalculate_order_from_reposition(int on_tag_id, int with_tag_id, bool above);
+	void recalculate_order(InternalTag *parent, InternalTag *excluding = nullptr);
 
+	void recalculate_order(InternalTag *moved_tag, InternalTag *to_tag, 
+        InternalTag *new_parent, int pos);
 };

@@ -124,8 +124,8 @@ void TagDatabase::move_tag(InternalTag *moving, InternalTag *to, int positioning
 	
 	int moving_id = moving->get_id();
 	StringName moving_name = moving->get_tag_name();
-    InternalTag *parent = moving->get_parent();
-    InternalTag *to_parent = (positioning == 1 || positioning == -1) ? to->get_parent() : to;
+    InternalTag *moving_parent = moving->get_parent();
+    InternalTag *to_parent = to != nullptr ? to->get_parent() : nullptr;
 
 	if ((to_parent != nullptr && to_parent->get_child(moving_name) != nullptr) 
 		|| (to_parent == nullptr && get_node(moving_name))) 
@@ -137,73 +137,33 @@ void TagDatabase::move_tag(InternalTag *moving, InternalTag *to, int positioning
 		}
 	}
 
-	// 'to' should never be nullptr in the case of 0, 1 or -1
-	if (positioning == 0) {
-		recalculate_order(parent, moving);
-		order_map[moving_id] = to->get_child_ids().size();
-		UtilityFunctions::print(moving->get_tag_name() + SNAME(" - New order: ") 
-			+ UtilityFunctions::str(to->get_child_ids().size()));
-	}
-	else if (positioning == 1) {
-		if (to->get_child_ids().size() > 0) {
-			InternalTag *first = get_child_with_order(to, 0);
-
-			if (first == nullptr) {
-				return;
-			}
-			
-			recalculate_order_from_reposition(moving->get_id(), first->get_id(), true);
-			
-			if (parent != nullptr) {
-				parent->remove_child(moving);
-			}
-			else if (nodes.has(moving_id)) {
-				nodes.erase(moving_id);
-			}
-
-			to->add_child(moving);
-			save();
-
-			emit_signal("tag_moved");
-			return;
-		}
-		else {
-			recalculate_order_from_reposition(moving->get_id(), to->get_id(), false);
-		}
-	}
-	else if (positioning == -1) {
-		recalculate_order_from_reposition(moving->get_id(), to->get_id(), true);
-	}
-	else if (positioning == -100) {
-		recalculate_order(parent, moving);
-		order_map[moving_id] = nodes.size() - (parent == nullptr ? 1 : 0);
-		UtilityFunctions::print(moving->get_tag_name() + SNAME(" - New order: ") 
-			+ UtilityFunctions::str(nodes.size() - (parent == nullptr ? 1 : 0)));
-	}
-		
-	to = to_parent;
-	if (parent == to) {
-		save();
-		emit_signal("tag_moved");
-		return;
-	}
-
-    if (parent != nullptr) {
-        parent->remove_child(moving);
+	if (moving_parent != nullptr) {
+        moving_parent->remove_child(moving);
     }
 	else if (nodes.has(moving_id)) {
 		nodes.erase(moving_id);
 	}
 
-	if (to == nullptr) {
-		nodes[moving_id] = moving;
-		save();
+	recalculate_order(moving_parent);
 
-		emit_signal("tag_moved");
-		return;
+	if (positioning == 0) {
+		to->add_child(moving);
+		recalculate_order(to, moving);
+	}
+	else if (to != nullptr && to->get_child_ids().size() > 0 && positioning == 1) {
+		to->add_child(moving);
+		InternalTag *first = get_child_with_order(to, 0);
+		recalculate_order(moving, first, to, -1);
+	}
+	else if (to_parent == nullptr) {
+		nodes[moving_id] = moving;
+		recalculate_order(moving, to, to_parent, positioning);
+	}
+	else {
+		to_parent->add_child(moving);
+		recalculate_order(moving, to, to_parent, positioning);
 	}
 
-	to->add_child(moving);
 	save();
 
 	emit_signal("tag_moved");
@@ -388,11 +348,12 @@ Array TagDatabase::get_children_recursive(InternalTag *tag) {
 
 	if (tag == nullptr) {
 		top_tag_ids = nodes.keys();
-		top_tag_ids.sort_custom(callable_mp(this, &TagDatabase::sort_id));
 	}
 	else {
 		top_tag_ids = tag->get_child_ids();
 	}
+
+	top_tag_ids.sort_custom(callable_mp(this, &TagDatabase::sort_id));
 
 	for (size_t i = 0; i < top_tag_ids.size(); i++)
 	{
@@ -448,66 +409,78 @@ InternalTag *TagDatabase::get_child_with_order(InternalTag *parent, int order) {
 	return nullptr;
 }
 
-void TagDatabase::recalculate_order(InternalTag *parent, InternalTag *around) {
-	Array children = parent != nullptr ? parent->get_child_ids() : nodes.keys();
-	children.sort_custom(callable_mp(this, &TagDatabase::sort_id));
+void TagDatabase::recalculate_order(InternalTag *parent, InternalTag *excluding) {
+	Array children_ids = parent == nullptr ? nodes.keys() : parent->get_child_ids();
 
-	if (around != nullptr) {
-		children.erase(around->get_id());
+	if (excluding != nullptr) {
+		children_ids.erase(excluding->get_id());
 	}
 
-	for (size_t i = 0; i < children.size(); i++)
-	{		
-		UtilityFunctions::print(cast_to<InternalTag>(id_map[children[i]])->get_tag_name() + 
-		SNAME(" : ") + UtilityFunctions::str(order_map[children[i]]) + SNAME("->") 
-		+ UtilityFunctions::str(i));
-		
-		order_map[children[i]] = i;
+	for (size_t i = 0; i < children_ids.size(); i++) {	
+		UtilityFunctions::print(cast_to<InternalTag>(id_map[children_ids[i]])->get_tag_name() + 
+			SNAME(" : ") + UtilityFunctions::str(order_map[children_ids[i]]) + SNAME("->") 
+			+ UtilityFunctions::str(i));
+			
+		order_map[children_ids[i]] = i;
 	}
 }
 
-void TagDatabase::recalculate_order_from_reposition(int on_tag_id, int with_tag_id, bool above) {
-	InternalTag *on = cast_to<InternalTag>(id_map[on_tag_id]);
-	InternalTag *on_parent = on != nullptr ? on->get_parent() : nullptr;
-	
-	InternalTag *with = cast_to<InternalTag>(id_map[with_tag_id]);
-	InternalTag *with_parent = with != nullptr ? with->get_parent() : nullptr;
-	Array with_children = with_parent != nullptr ? with_parent->get_child_ids() : nodes.keys();
-	with_children.erase(on_tag_id);
-	with_children.sort_custom(callable_mp(this, &TagDatabase::sort_id));
+
+void TagDatabase::recalculate_order(InternalTag *moved_tag, InternalTag *to_tag, InternalTag *new_parent, int pos) {
+	int moved_id = moved_tag->get_id();
 
 	int adjust = 0;
-	int new_order = (int) order_map[with_tag_id] + (above 
-		? ((int) order_map[with_tag_id] > (int) order_map[on_tag_id] ? -1 : 0) 
-		: ((int) order_map[with_tag_id] < (int) order_map[on_tag_id] ? 1 : 0)
-	);
+	int new_order;
 
-	UtilityFunctions::print("To: ");
-	for (size_t i = 0; i < with_children.size(); i++)
+	
+	// UtilityFunctions::print("Pre-Reorder: ");
+	recalculate_order(new_parent, moved_tag);
+	
+	switch (pos)
 	{
+		case -1:
+		new_order = order_map[to_tag->get_id()];
+		break;
+		
+		case 0:
+		new_order = to_tag->get_child_ids().size() - 1;
+		break;
+		
+		case 1:
+		new_order = (int) order_map[to_tag->get_id()] + 1;
+		break;
+		
+		default:
+		new_order = nodes.size() - 1;
+		break;
+	}
+	
+	Array children_ids = new_parent == nullptr ? nodes.keys() : new_parent->get_child_ids();
+	children_ids.erase(moved_id);
+
+	// UtilityFunctions::print("Reorder: ");
+	// UtilityFunctions::print(cast_to<InternalTag>(id_map[moved_id])->get_tag_name() +
+	// SNAME(" : ") + UtilityFunctions::str(order_map[moved_id]) + SNAME("->") 
+	// + UtilityFunctions::str(new_order));
+
+	for (size_t i = 0; i < children_ids.size(); i++) {
 		if (new_order <= i) {
 			adjust = 1;
 		}
 
 		int adjusted_order = i + adjust;
 		
-		UtilityFunctions::print(cast_to<InternalTag>(id_map[with_children[i]])->get_tag_name() + 
-		SNAME(" : ") + UtilityFunctions::str(order_map[with_children[i]]) + SNAME("->") 
-		+ UtilityFunctions::str(adjusted_order));
+		// UtilityFunctions::print(cast_to<InternalTag>(id_map[children_ids[i]])->get_tag_name() + 
+		// 	SNAME(" : ") + UtilityFunctions::str(order_map[children_ids[i]]) + SNAME("->") 
+		// 	+ UtilityFunctions::str(adjusted_order));
 		
-		order_map[with_children[i]] = adjusted_order;
+		order_map[children_ids[i]] = adjusted_order;
 	}
 
-	UtilityFunctions::print(on->get_tag_name() + SNAME(" - New order: ") + UtilityFunctions::str(new_order));
-	order_map[on_tag_id] = new_order;
-		
-	if (on_parent == with_parent) {
-		return;
-	}
-
-	UtilityFunctions::print("From: ");
-	recalculate_order(on_parent, on);
+	order_map[moved_id] = new_order;
 }
+
+
 
 bool TagDatabase::sort_id(Variant a, Variant b) {
 	return (int) order_map[a] < (int) order_map[b];
