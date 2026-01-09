@@ -115,8 +115,8 @@ InternalTag *TagDatabase::add_tag(StringName name, InternalTag* parent) {
 }
 
 void TagDatabase::move_tag(InternalTag *moving, InternalTag *to, int positioning) {
-    UtilityFunctions::print(SNAME("\n") + moving->get_path() + SNAME(" to ") 
-        + to->get_path() + ": " + UtilityFunctions::str(positioning));
+    // UtilityFunctions::print(SNAME("\n") + moving->get_path() + SNAME(" to ") 
+    //     + to->get_path() + ": " + UtilityFunctions::str(positioning));
 
     if (moving == to) {
         return;
@@ -291,7 +291,7 @@ void TagDatabase::load_tags_recursive(Array loaded_tags, InternalTag *parent) {
 		int id = tag["id"];
 		Array children = tag["children"];
 		
-		UtilityFunctions::print("Loading tag: " + tag_name);
+		// UtilityFunctions::print("Loading tag: " + tag_name);
 
 		InternalTag *loaded_tag = memnew(InternalTag);
 		next_id = UtilityFunctions::max(id, next_id);
@@ -417,9 +417,9 @@ void TagDatabase::recalculate_order(InternalTag *parent, InternalTag *excluding)
 	}
 
 	for (size_t i = 0; i < children_ids.size(); i++) {	
-		UtilityFunctions::print(cast_to<InternalTag>(id_map[children_ids[i]])->get_tag_name() + 
-			SNAME(" : ") + UtilityFunctions::str(order_map[children_ids[i]]) + SNAME("->") 
-			+ UtilityFunctions::str(i));
+		// UtilityFunctions::print(cast_to<InternalTag>(id_map[children_ids[i]])->get_tag_name() + 
+		// 	SNAME(" : ") + UtilityFunctions::str(order_map[children_ids[i]]) + SNAME("->") 
+		// 	+ UtilityFunctions::str(i));
 			
 		order_map[children_ids[i]] = i;
 	}
