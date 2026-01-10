@@ -64,4 +64,6 @@ private:
 
 	void recalculate_order(InternalTag *moved_tag, InternalTag *to_tag, 
         InternalTag *new_parent, int pos);
+
+    bool tag_has_parent(InternalTag *tag, InternalTag *parent);
 };

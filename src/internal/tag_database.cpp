@@ -136,6 +136,12 @@ void TagDatabase::move_tag(InternalTag *moving, InternalTag *to, int positioning
 			return;
 		}
 	}
+	
+	if (to_parent != nullptr && tag_has_parent(to_parent, moving))
+	{
+		UtilityFunctions::push_error("Reparenting to children is not allowed!");
+		return;
+	}
 
 	if (moving_parent != nullptr) {
         moving_parent->remove_child(moving);
@@ -425,7 +431,6 @@ void TagDatabase::recalculate_order(InternalTag *parent, InternalTag *excluding)
 	}
 }
 
-
 void TagDatabase::recalculate_order(InternalTag *moved_tag, InternalTag *to_tag, InternalTag *new_parent, int pos) {
 	int moved_id = moved_tag->get_id();
 
@@ -480,7 +485,20 @@ void TagDatabase::recalculate_order(InternalTag *moved_tag, InternalTag *to_tag,
 	order_map[moved_id] = new_order;
 }
 
+bool TagDatabase::tag_has_parent(InternalTag *tag, InternalTag *parent) {
+	InternalTag *currentTag = tag;
 
+	while (currentTag != nullptr)
+	{
+		if (currentTag == parent) {
+			return true;
+		}
+		
+		currentTag = currentTag->get_parent();
+	}
+	
+	return false;
+}
 
 bool TagDatabase::sort_id(Variant a, Variant b) {
 	return (int) order_map[a] < (int) order_map[b];
