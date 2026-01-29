@@ -1,8 +1,11 @@
-[gd_scene load_steps=34 format=3 uid="uid://dh0oj81pufivs"]
+[gd_scene format=3 uid="uid://dh0oj81pufivs"]
 
 [ext_resource type="Script" uid="uid://dnryqi700idk5" path="res://scripts/tag_comparing_object.gd" id="2_j1pmf"]
 [ext_resource type="Script" uid="uid://bkwk40ybs8kgm" path="res://scripts/container_comparing_object_.gd" id="3_cpijt"]
 [ext_resource type="Script" uid="uid://cdaax774hyo1l" path="res://scripts/container_comparing_tag_object.gd" id="3_t6etu"]
+[ext_resource type="Script" uid="uid://dlleadkjkvru" path="res://scripts/resource_tag_comparing_object.gd" id="4_cpijt"]
+[ext_resource type="Resource" uid="uid://c41veetidt3n" path="res://res_a.tres" id="5_paaqm"]
+[ext_resource type="Resource" uid="uid://bav8c6ycvlb2c" path="res://res_b.tres" id="6_reemd"]
 
 [sub_resource type="Tag" id="Tag_t6etu"]
 _linked_id = 0
@@ -158,88 +161,93 @@ _tag_id_map = {
 3: true
 }
 
-[node name="Root" type="Node"]
+[node name="Root" type="Node" unique_id=576782382]
 
-[node name="Tag" type="Node" parent="."]
+[node name="Tag" type="Node" parent="." unique_id=1930673763]
 
-[node name="TagMatchDemo" type="Node" parent="Tag"]
+[node name="TagMatchDemo" type="Node" parent="Tag" unique_id=799530202]
 script = ExtResource("2_j1pmf")
 tag_a = SubResource("Tag_t6etu")
 tag_b = SubResource("Tag_cpijt")
 
-[node name="TagFailMatchDemo" type="Node" parent="Tag"]
+[node name="TagFailMatchDemo" type="Node" parent="Tag" unique_id=737138755]
 script = ExtResource("2_j1pmf")
 tag_a = SubResource("Tag_reemd")
 tag_b = SubResource("Tag_llj5n")
 
-[node name="TagInheritanceMatchDemo" type="Node" parent="Tag"]
+[node name="TagInheritanceMatchDemo" type="Node" parent="Tag" unique_id=1479012444]
 script = ExtResource("2_j1pmf")
 tag_a = SubResource("Tag_iuf4w")
 tag_b = SubResource("Tag_paaqm")
 
-[node name="TagInheritanceFailDemo" type="Node" parent="Tag"]
+[node name="TagInheritanceFailDemo" type="Node" parent="Tag" unique_id=1073571077]
 script = ExtResource("2_j1pmf")
 tag_a = SubResource("Tag_m5l2a")
 tag_b = SubResource("Tag_6sieb")
 
-[node name="TagContainer" type="Node" parent="."]
+[node name="TagContainer" type="Node" parent="." unique_id=911490439]
 
-[node name="ContainerHasMatchDemo" type="Node" parent="TagContainer"]
+[node name="ContainerHasMatchDemo" type="Node" parent="TagContainer" unique_id=355963098]
 script = ExtResource("3_t6etu")
 container = SubResource("TagContainer_t6etu")
 tag = SubResource("Tag_q63f0")
 
-[node name="ContainerHasFailDemo" type="Node" parent="TagContainer"]
+[node name="ContainerHasFailDemo" type="Node" parent="TagContainer" unique_id=1310647645]
 script = ExtResource("3_t6etu")
 container = SubResource("TagContainer_cpijt")
 tag = SubResource("Tag_3vedc")
 
-[node name="ContainerAnyPassDemo" type="Node" parent="TagContainer"]
+[node name="ContainerAnyPassDemo" type="Node" parent="TagContainer" unique_id=45294666]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_l0ncq")
 container_b = SubResource("TagContainer_wffsx")
 
-[node name="ContainerAnyFailDemo" type="Node" parent="TagContainer"]
+[node name="ContainerAnyFailDemo" type="Node" parent="TagContainer" unique_id=893303809]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_51o3q")
 container_b = SubResource("TagContainer_5vpmp")
 
-[node name="ContainerExactPassDemo" type="Node" parent="TagContainer"]
+[node name="ContainerExactPassDemo" type="Node" parent="TagContainer" unique_id=1399944588]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_iuf4w")
 container_b = SubResource("TagContainer_paaqm")
 
-[node name="ContainerExactFailDemo" type="Node" parent="TagContainer"]
+[node name="ContainerExactFailDemo" type="Node" parent="TagContainer" unique_id=642797059]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_reemd")
 container_b = SubResource("TagContainer_llj5n")
 
-[node name="ContainerAllPassDemo" type="Node" parent="TagContainer"]
+[node name="ContainerAllPassDemo" type="Node" parent="TagContainer" unique_id=27479557]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_m5l2a")
 container_b = SubResource("TagContainer_6sieb")
 
-[node name="ContainerAllFailDemo" type="Node" parent="TagContainer"]
+[node name="ContainerAllFailDemo" type="Node" parent="TagContainer" unique_id=1141781933]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_q63f0")
 container_b = SubResource("TagContainer_3vedc")
 
-[node name="ContainerNonePassDemo" type="Node" parent="TagContainer"]
+[node name="ContainerNonePassDemo" type="Node" parent="TagContainer" unique_id=806655830]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_d2jd3")
 container_b = SubResource("TagContainer_gsfgt")
 
-[node name="ContainerNoneFailDemo" type="Node" parent="TagContainer"]
+[node name="ContainerNoneFailDemo" type="Node" parent="TagContainer" unique_id=2142072782]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_n8c11")
 container_b = SubResource("TagContainer_huric")
 
-[node name="ContainerCountDemo" type="Node" parent="TagContainer"]
+[node name="ContainerCountDemo" type="Node" parent="TagContainer" unique_id=495174620]
 script = ExtResource("3_cpijt")
 container_a = SubResource("TagContainer_igahw")
 container_b = SubResource("TagContainer_5vrnx")
 
-[node name="Control" type="Control" parent="."]
+[node name="Resource" type="Node" parent="." unique_id=911866846]
+script = ExtResource("4_cpijt")
+res_a = ExtResource("5_paaqm")
+res_b = ExtResource("6_reemd")
+
+[node name="Control" type="Control" parent="." unique_id=302612842]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -247,7 +255,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GridContainer" type="GridContainer" parent="Control"]
+[node name="GridContainer" type="GridContainer" parent="Control" unique_id=992124491]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -262,63 +270,63 @@ grow_horizontal = 2
 grow_vertical = 2
 columns = 4
 
-[node name="TagMatchPass" type="Button" parent="Control/GridContainer"]
+[node name="TagMatchPass" type="Button" parent="Control/GridContainer" unique_id=1899665268]
 layout_mode = 2
 text = "Tag Match Pass"
 
-[node name="TagMatchFail" type="Button" parent="Control/GridContainer"]
+[node name="TagMatchFail" type="Button" parent="Control/GridContainer" unique_id=1818913385]
 layout_mode = 2
 text = " Tag Match Fail"
 
-[node name="TagInheritPass" type="Button" parent="Control/GridContainer"]
+[node name="TagInheritPass" type="Button" parent="Control/GridContainer" unique_id=627183659]
 layout_mode = 2
 text = "Tag Inherit Pass"
 
-[node name="TagInheritFail" type="Button" parent="Control/GridContainer"]
+[node name="TagInheritFail" type="Button" parent="Control/GridContainer" unique_id=1080800532]
 layout_mode = 2
 text = "Tag Inherit Fail"
 
-[node name="ContainerHasMatch" type="Button" parent="Control/GridContainer"]
+[node name="ContainerHasMatch" type="Button" parent="Control/GridContainer" unique_id=1578030355]
 layout_mode = 2
 text = "Container Has Match"
 
-[node name="ContainerHasFail" type="Button" parent="Control/GridContainer"]
+[node name="ContainerHasFail" type="Button" parent="Control/GridContainer" unique_id=528444010]
 layout_mode = 2
 text = "Container Has Fail"
 
-[node name="ContainerAnyPass" type="Button" parent="Control/GridContainer"]
+[node name="ContainerAnyPass" type="Button" parent="Control/GridContainer" unique_id=489011518]
 layout_mode = 2
 text = "Container Any Pass"
 
-[node name="ContainerAnyFail" type="Button" parent="Control/GridContainer"]
+[node name="ContainerAnyFail" type="Button" parent="Control/GridContainer" unique_id=680381135]
 layout_mode = 2
 text = "Container Any Fail"
 
-[node name="ContainerExactPass" type="Button" parent="Control/GridContainer"]
+[node name="ContainerExactPass" type="Button" parent="Control/GridContainer" unique_id=1991102307]
 layout_mode = 2
 text = "Container Exact Pass"
 
-[node name="ContainerExactFail" type="Button" parent="Control/GridContainer"]
+[node name="ContainerExactFail" type="Button" parent="Control/GridContainer" unique_id=823413209]
 layout_mode = 2
 text = "Container Exact Fail"
 
-[node name="ContainerAllPass" type="Button" parent="Control/GridContainer"]
+[node name="ContainerAllPass" type="Button" parent="Control/GridContainer" unique_id=1928741484]
 layout_mode = 2
 text = "ContainerAllPass"
 
-[node name="ContainerAllFail" type="Button" parent="Control/GridContainer"]
+[node name="ContainerAllFail" type="Button" parent="Control/GridContainer" unique_id=672372598]
 layout_mode = 2
 text = "ContainerAllFail"
 
-[node name="ContainerNonePass" type="Button" parent="Control/GridContainer"]
+[node name="ContainerNonePass" type="Button" parent="Control/GridContainer" unique_id=1348054541]
 layout_mode = 2
 text = "Container None Pass"
 
-[node name="ContainerNoneFail" type="Button" parent="Control/GridContainer"]
+[node name="ContainerNoneFail" type="Button" parent="Control/GridContainer" unique_id=977031023]
 layout_mode = 2
 text = "Container None Fail"
 
-[node name="ContainerCount" type="Button" parent="Control/GridContainer"]
+[node name="ContainerCount" type="Button" parent="Control/GridContainer" unique_id=613174053]
 layout_mode = 2
 text = "Container Count"
 

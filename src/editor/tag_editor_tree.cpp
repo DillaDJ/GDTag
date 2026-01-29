@@ -239,8 +239,6 @@ void TagEditorTree::pop_child_config(TreeItem *item, Array container) {
     {
         TreeItem *child = item->get_child(i);
         child->set_collapsed(container[2 * i]);
-        
-        UtilityFunctions::print(child->get_text(0));
 
         pop_child_config(child, container[2 * i + 1]);
     }    
