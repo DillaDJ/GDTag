@@ -13,6 +13,7 @@ TagEditorTree::TagEditorTree() {
     root_item = create_item();
 
     populate_tags_recursive(nullptr, nullptr);
+    call_deferred("collapse_all");
 }
 
 void TagEditorTree::reset() {
@@ -172,8 +173,22 @@ void TagEditorTree::_drop_data(const Vector2 &p_at_position, const Variant &p_da
     database->move_tag(tag, landing_tag, drop_section);
 }
 
+void TagEditorTree::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("collapse_all"), &TagEditorTree::collapse_all);
+}
+
+void TagEditorTree::collapse_all() {
+    TreeItem *next = root_item->get_first_child();
+
+    while (next != nullptr)
+    {
+        next->set_collapsed_recursive(true);
+        next = next->get_next();
+    }
+}
+
 void TagEditorTree::populate_tags_recursive(TreeItem *parent_item, InternalTag *parent_tag) {
-    Array children = parent_tag == nullptr ? database->get_nodes() : parent_tag->get_children();
+	Array children = parent_tag == nullptr ? database->get_nodes() : parent_tag->get_children();
 
     for (size_t i = 0; i < children.size(); i++)
     {
@@ -190,6 +205,47 @@ void TagEditorTree::populate_tags_recursive(TreeItem *parent_item, InternalTag *
         populate_tags_recursive(item, tag);
     }
 }
+
+void TagEditorTree::push_last_config() {
+    last_config = Array();
+    push_child_config(root_item->get_first_child(), last_config);
+}
+
+void TagEditorTree::push_child_config(TreeItem *item, Array container) {
+    Array children = Array();
+    
+    while (item != nullptr)
+    {
+        container.append(item->is_collapsed());
+
+        push_child_config(item->get_first_child(), children);
+        container.append(children);
+        
+        item = item->get_next();
+    }
+}
+
+void TagEditorTree::pop_last_config() {
+    pop_child_config(root_item, last_config);
+    last_config.clear();
+}
+
+void TagEditorTree::pop_child_config(TreeItem *item, Array container) {
+    if (item == nullptr || container.size() != 2 * item->get_child_count()) { 
+        return; 
+    }
+
+    for (size_t i = 0; i < item->get_child_count(); i++)
+    {
+        TreeItem *child = item->get_child(i);
+        child->set_collapsed(container[2 * i]);
+        
+        UtilityFunctions::print(child->get_text(0));
+
+        pop_child_config(child, container[2 * i + 1]);
+    }    
+}
+
 
 void TagEditorTree::uncheck_recursive(TreeItem *item) {
     if (item->get_child_count() == 0) {

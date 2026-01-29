@@ -70,7 +70,7 @@ void TagEditor::_enter_tree() {
     main_container->add_theme_stylebox_override("panel",
     get_theme_stylebox("sub_inspector_bg1", SNAME("EditorStyles")));
 
-    del_tag_btn->set_button_icon(get_theme_icon(SNAME("Remove"), SNAME("EditorIcons")));    
+    del_tag_btn->set_button_icon(get_theme_icon(SNAME("Remove"), SNAME("EditorIcons")));
 }
 
 void TagEditor::_exit_tree() {
@@ -115,7 +115,9 @@ void TagEditor::_bind_methods() {
 }
 
 void TagEditor::refresh_tags() {
+    tag_tree->push_last_config();
     tag_tree->reset();
+    tag_tree->pop_last_config();
 }
 
 void TagEditor::toggle_database_signal_connections(bool on) {
